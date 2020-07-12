@@ -83,3 +83,13 @@ nyb_player = f'''{R.img('newyearburst.jpg').cqcode}
 async def new_year_burst(bot, ev):
     if random.random() < 0.02:
         await bot.send(ev, nyb_player)
+
+qks_url = ["granbluefantasy.jp"]
+qksimg = R.img('anti.jpg').cqcode
+@sv.on_keyword(qks_url)
+async def qks_keyword(bot, ev):
+    msg = f'骑空士爪巴\n{qksimg}'
+    await bot.send(ev, msg, at_sender=True)
+    await util.silence(ev, 60)
+
+

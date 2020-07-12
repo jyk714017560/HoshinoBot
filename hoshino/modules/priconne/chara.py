@@ -101,10 +101,10 @@ def is_npc(id_):
 
 def gen_team_pic(team, size=64, star_slot_verbose=True):
     num = len(team)
-    des = Image.new('RGBA', (num*size, size), (255, 255, 255, 255))
+    des = Image.new('RGBA', (num * size + (num - 1) * 5, size), (255, 255, 255, 0))
     for i, chara in enumerate(team):
         src = chara.render_icon(size, star_slot_verbose)
-        des.paste(src, (i * size, 0), src)
+        des.paste(src, (i * (size + 5), 0), src)
     return des
 
 
@@ -142,7 +142,7 @@ class Chara:
 
     @property
     def icon(self):
-        star = '3' if 1 <= self.star <= 5 else '6'
+        star = '1' if 0 <= self.star <= 2 else '3'
         res = R.img(f'priconne/unit/icon_unit_{self.id}{star}1.png')
         if not res.exist:
             res = R.img(f'priconne/unit/icon_unit_{self.id}31.png')

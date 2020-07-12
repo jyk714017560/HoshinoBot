@@ -3,101 +3,113 @@ import random
 from hoshino import util
 from .. import chara
 
-
 class Gacha(object):
 
-    def __init__(self, pool_name:str = "MIX"):
+    def __init__(self, pool_name: str = "CN"):
         super().__init__()
         self.load_pool(pool_name)
 
 
-    def load_pool(self, pool_name:str):
+    def load_pool(self, pool_name: str):
         config = util.load_config(__file__)
         pool = config[pool_name]
         self.up_prob = pool["up_prob"]
         self.s3_prob = pool["s3_prob"]
         self.s2_prob = pool["s2_prob"]
-        self.s1_prob = 1000 - self.s2_prob - self.s3_prob
+        self.s1_prob = 1000 - self.s3_prob - self.s2_prob
         self.up = pool["up"]
         self.star3 = pool["star3"]
         self.star2 = pool["star2"]
         self.star1 = pool["star1"]
 
+        self.up_star = pool["up_star"]
+        self.up3_prob = 0
+        self.up2_prob = 0
+        self.up1_prob = 0
+        for i in range(len(self.up)):
+            if self.up_star[i] == 3:
+                self.up3_prob += self.up_prob[i]
+            elif self.up_star[i] == 2:
+                self.up2_prob += self.up_prob[i]
+            else:
+                self.up1_prob += self.up_prob[i]
 
-    def gacha_one(self, up_prob:int, s3_prob:int, s2_prob:int, s1_prob:int = None):
-        '''
-        sx_prob: x星概率，要求和为1000
-        up_prob: UP角色概率（从3星划出）
-        up_chara: UP角色名列表
 
-        return: (单抽结果:Chara, 秘石数:int)
-        ---------------------------
-        |up|      |  20  |   78   |
-        |   ***   |  **  |    *   |
-        ---------------------------
-        '''
+    def gacha_one(self, up3_prob: int, up2_prob: int, up1_prob: int, s3_prob: int, s2_prob: int, s1_prob: int = None):
         if s1_prob is None:
             s1_prob = 1000 - s3_prob - s2_prob
         total_ = s3_prob + s2_prob + s1_prob
         pick = random.randint(1, total_)
-        if pick <= up_prob:
-            return chara.fromname(random.choice(self.up), 3), 100
-        elif pick <= s3_prob:
-            return chara.fromname(random.choice(self.star3), 3), 50
-        elif pick <= s2_prob + s3_prob:
-            return chara.fromname(random.choice(self.star2), 2), 10
+        if pick <= up3_prob:
+            for i in range(len(self.up)):
+                if self.up_star[i] == 3:
+                    return chara.fromname(self.up[i], 3)
+        elif pick <= up3_prob + up2_prob:
+            for i in range(len(self.up)):
+                if self.up_star[i] == 2:
+                    return chara.fromname(self.up[i], 2)
+        elif pick <= up3_prob + up2_prob + up1_prob:
+            for i in range(len(self.up)):
+                if self.up_star[i] == 1:
+                    return chara.fromname(self.up[i], 1)
+        elif pick <= s3_prob + up2_prob + up1_prob:
+            return chara.fromname(random.choice(self.star3), 3)
+        elif pick <= s3_prob + s2_prob + up1_prob:
+            return chara.fromname(random.choice(self.star2), 2)
         else:
-            return chara.fromname(random.choice(self.star1), 1), 1
-
+            return chara.fromname(random.choice(self.star1), 1)
+    
 
     def gacha_ten(self):
         result = []
-        hiishi = 0
-        up = self.up_prob
+        up3 = self.up3_prob
+        up2 = self.up2_prob
+        up1 = self.up1_prob
         s3 = self.s3_prob
         s2 = self.s2_prob
         s1 = 1000 - s3 - s2
-        for _ in range(9):    # 前9连
-            c, y = self.gacha_one(up, s3, s2, s1)
+        for i in range(9):
+            c = self.gacha_one(up3, up2, up1, s3, s2, s1)
             result.append(c)
-            hiishi += y
-        c, y = self.gacha_one(up, s3, s2 + s1, 0)    # 保底第10抽
+        c = self.gacha_one(up3, up2, 0, s3, s2 + s1, 0)
         result.append(c)
-        hiishi += y
 
-        return result, hiishi
+        return result
 
 
     def gacha_tenjou(self):
-        result = {'up': [], 's3': [], 's2':[], 's1':[]}
-        first_up_pos = 999999
-        up = self.up_prob
+        result = {'up': [], 's3': [], 's2': [], 's1': []}
+        first_up_pos = 99999
+        up3 = self.up3_prob
+        up2 = self.up2_prob
+        up1 = self.up1_prob
         s3 = self.s3_prob
         s2 = self.s2_prob
         s1 = 1000 - s3 - s2
         for i in range(9 * 30):
-            c, y = self.gacha_one(up, s3, s2, s1)
-            if 100 == y:
-                result['up'].append(c)
-                first_up_pos = min(first_up_pos, 10 * ((i+1) // 9) + ((i+1) % 9))
-            elif 50 == y:
-                result['s3'].append(c)
-            elif 10 == y:
-                result['s2'].append(c)
-            elif 1 == y:
+            c = self.gacha_one(up3, up2, up1, s3, s2, s1)
+            if c.star == 1:
                 result['s1'].append(c)
-            else:
-                pass    # should never reach here
-        for i in range(30):
-            c, y = self.gacha_one(up, s3, s2 + s1, 0)
-            if 100 == y:
-                result['up'].append(c)
-                first_up_pos = min(first_up_pos, 10 * (i+1))
-            elif 50 == y:
-                result['s3'].append(c)
-            elif 10 == y:
+            elif c.star == 2:
                 result['s2'].append(c)
+            elif c.name in self.up:
+                result['up'].append(c)
+                first_up_pos = min(first_up_pos, 10 * ((i + 1) // 9) + ((i + 1) % 9))
+            elif c.star == 3:
+                result['s3'].append(c)
             else:
-                pass    # should never reach here
+                pass
+            
+        for i in range(30):
+            c = self.gacha_one(up3, up2, 0, s3, s2 + s1, 0)
+            if c.star == 2:
+                result['s2'].append(c)
+            elif c.name in self.up:
+                result['up'].append(c)
+                first_up_pos = min(first_up_pos, 10 * (i + 1))
+            elif c.star == 3:
+                result['s3'].append(c)
+            else:
+                pass
         result['first_up_pos'] = first_up_pos
-        return result
+        return result      

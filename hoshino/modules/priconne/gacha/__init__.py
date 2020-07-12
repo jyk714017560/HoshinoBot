@@ -1,24 +1,28 @@
 import os
 import random
 from collections import defaultdict
+from functools import reduce
+import pickle
 
 from hoshino import Service, priv, util
 from hoshino.typing import *
-from hoshino.util import DailyNumberLimiter, concat_pic, pic2b64, silence
+from hoshino.util import DailyNumberLimiter, concat_pic, pic2b64
 
 from .. import chara
+from .. import _pcr_data
 from .gacha import Gacha
+from .gachamaster import GachaMaster
+from .exception import *
 
 try:
     import ujson as json
 except:
     import json
 
-
 sv_help = '''
-[星乃来发十连] 转蛋模拟
-[星乃来发单抽] 转蛋模拟
-[星乃来一井] 4w5钻！
+[#来发十连] 十连模拟
+[#来发单抽] 单抽模拟
+[#来一井] 4w5钻！
 [查看卡池] 模拟卡池&出率
 [切换卡池] 更换模拟卡池
 '''.strip()
@@ -26,10 +30,11 @@ sv = Service('gacha', help_=sv_help, bundle='pcr娱乐')
 jewel_limit = DailyNumberLimiter(6000)
 tenjo_limit = DailyNumberLimiter(1)
 
-JEWEL_EXCEED_NOTICE = f'您今天已经抽过{jewel_limit.max}钻了，欢迎明早5点后再来！'
-TENJO_EXCEED_NOTICE = f'您今天已经抽过{tenjo_limit.max}张天井券了，欢迎明早5点后再来！'
-POOL = ('MIX', 'JP', 'TW', 'BL')
-DEFAULT_POOL = POOL[0]
+JEWEL_EXCEED_NOTICE = f'你今天已经抽过{jewel_limit.max}钻了，欢迎明早5点后再来！'
+TENJO_EXCEED_NOTICE = f'你今天已经抽过{tenjo_limit.max}张天井券了，欢迎明早5点后再来！'
+JEWEL_EMPTY_NOTICE=f'う～ん,骑士君你的宝石不够呢~'
+POOL = ('MIX', 'JP', 'TW', 'CN')
+DEFAULT_POOL = POOL[3]
 
 _pool_config_file = os.path.expanduser('~/.hoshino/group_pool_config.json')
 _group_pool = {}
@@ -40,9 +45,24 @@ except FileNotFoundError as e:
     sv.logger.warning('group_pool_config.json not found, will create when needed.')
 _group_pool = defaultdict(lambda: DEFAULT_POOL, _group_pool)
 
+
+_colle_config_file = os.path.expanduser('~/.hoshino/colle_enable_config.json')
+_colle_enable = {}
+try:
+    with open(_colle_config_file, encoding='utf8') as f:
+        _colle_enable = json.load(f)
+except FileNotFoundError as e:
+    sv.logger.warning('colle_enable_config.json not found, will create when needed.')
+_colle_enable = defaultdict(lambda: False, _colle_enable)
+
 def dump_pool_config():
     with open(_pool_config_file, 'w', encoding='utf8') as f:
         json.dump(_group_pool, f, ensure_ascii=False)
+
+
+def dump_colle_config():
+    with open(_colle_config_file, 'w', encoding='utf8') as f:
+        json.dump(_colle_enable, f, ensure_ascii=False)
 
 
 gacha_10_aliases = ('抽十连', '十连', '十连！', '十连抽', '来个十连', '来发十连', '来次十连', '抽个十连', '抽发十连', '抽次十连', '十连扭蛋', '扭蛋十连',
@@ -52,31 +72,116 @@ gacha_10_aliases = ('抽十连', '十连', '十连！', '十连抽', '来个十�
 gacha_1_aliases = ('单抽', '单抽！', '来发单抽', '来个单抽', '来次单抽', '扭蛋单抽', '单抽扭蛋',
                    '單抽', '單抽！', '來發單抽', '來個單抽', '來次單抽', '轉蛋單抽', '單抽轉蛋')
 gacha_300_aliases = ('抽一井', '来一井', '来发井', '抽发井', '天井扭蛋', '扭蛋天井', '天井轉蛋', '轉蛋天井')
+gacha_info_aliases = ('卡池资讯', '查看卡池', '看看卡池', '康康卡池', '卡池資訊', '看看up', '看看UP')
 
+
+@sv.on_prefix('建立仓库')
+async def add_colle(bot, ev: CQEvent):
+    if not priv.check_priv(ev, priv.SUPERUSER):
+        await bot.finish(ev, '测试功能，仅限主人使用哦', at_sender=True)
+    
+    uid = str(ev.user_id)
+    name = ev.sender['nickname']
+    if not _colle_enable[uid]:
+        await bot.finish(ev, f'{name}君你还没有开启仓库功能，请使用\"启用仓库\"开启功能')
+
+    gm = GachaMaster(ev.user_id)
+    if gm.has_colle():
+        await bot.send(ev, '你已经有一个仓库了，不可以重复建立哦~', at_sender=True)
+    else:
+        colle = pickle.dumps({'贪吃佩可': 1, '可可萝': 1, '凯留': 1, '优衣': 1})
+        try:
+            gm.add_colle(colle, 45000, 0)
+        except DatabaseError as e:
+            await bot.finish(ev, f'DatabaseError: {e.message}\nごめんなさい！嘤嘤嘤(〒︿〒)', at_sender=True)
+        await bot.send(ev, f'恭喜{name}君的仓库建立成功~')
+
+
+@sv.on_prefix('查看仓库')
+async def list_colle(bot, ev: CQEvent):
+    if not priv.check_priv(ev, priv.SUPERUSER):
+        await bot.finish(ev, '测试功能，仅限主人使用哦', at_sender=True)
+
+    uid = str(ev.user_id)
+    name = ev.sender['nickname']
+    if not _colle_enable[uid]:
+        await bot.finish(ev, f'{name}君你还没有开启仓库功能，请使用\"启用仓库\"开启功能')
+
+    gm = GachaMaster(ev.user_id)
+    try:
+        db = gm.get_colle()
+    except DatabaseError as e:
+        await bot.finish(ev, f'DatabaseError: {e.message}\nごめんなさい！嘤嘤嘤(〒︿〒)', at_sender=True)
+    if db:
+        colle = pickle.loads(db['colle'])
+        jewel = db['jewel']
+        hiishi = db['hiishi']
+
+        result = []
+        pics = []
+        collelen = len(colle)
+        charalen = len(_pcr_data.CHARA_NAME) - 4
+
+        if collelen <= 20:
+            for k, v in colle.items():
+                c = chara.fromname(k, v)
+                result.append(c)
+
+        else:
+            for k, v in colle.items():
+                if v >= 3:
+                    c = chara.fromname(k, v)
+                    result.append(c)
+        
+        if len(result):
+            lenth = len(result)
+            random.shuffle(result)
+            for i in range(0, lenth, 5):
+                j = min(lenth, i + 5)
+                pics.append(chara.gen_team_pic(result[i:j], star_slot_verbose=False))
+            result = concat_pic(pics)
+            result = pic2b64(result)
+            result = MessageSegment.image(result)
+        
+            msg = [f"{name}君的仓库为",
+                f"{result}",
+                f"图鉴完成度:{collelen}/{charalen}",
+                f"宝石:{jewel}, 女神的秘石:{hiishi}"
+            ]
+            await bot.send(ev, '\n'.join(msg))
+        else:
+            msg = [f"やばいですね☆, {name}君的仓库一个三星都没有",
+                f"图鉴完成度:{collelen}/{charalen}",
+                f"宝石:{jewel}, 女神的秘石:{hiishi}"
+            ]
+            await bot.send(ev, '\n'.join(msg))
+    else:
+        await bot.send(ev,f'{name}君你还没有仓库，请使用\"建立仓库\"进行初始化')
+
+    
 @sv.on_fullmatch(('卡池资讯', '查看卡池', '看看卡池', '康康卡池', '卡池資訊', '看看up', '看看UP'))
 async def gacha_info(bot, ev: CQEvent):
     gid = str(ev.group_id)
     gacha = Gacha(_group_pool[gid])
     up_chara = gacha.up
+    up_star = gacha.up_star
+    up_prob = gacha.up_prob
     if sv.bot.config.USE_CQPRO:
-        up_chara = map(lambda x: str(
-            chara.fromname(x, star=3).icon.cqcode) + x, up_chara)
+        up_chara = map(lambda x, y, z: str(chara.fromname(x, y).icon.cqcode) + x + ':' + str(z / 10) + '%', up_chara, up_star, up_prob)
     up_chara = '\n'.join(up_chara)
-    await bot.send(ev, f"本期卡池主打的角色：\n{up_chara}\nUP角色合计={(gacha.up_prob/10):.1f}% 3★出率={(gacha.s3_prob)/10:.1f}%")
+    await bot.send(ev, f"本期卡池主打的角色：\n{up_chara}\n3★出率={(gacha.s3_prob)/10:.1f}% 2★出率={(gacha.s2_prob)/10:.1f}%")
 
 
-POOL_NAME_TIP = '请选择以下卡池\n> 切换卡池jp\n> 切换卡池tw\n> 切换卡池b\n> 切换卡池mix'
+POOL_NAME_TIP = '请选择以下卡池\n> 切换卡池jp\n> 切换卡池tw\n> 切换卡池cn\n> 切换卡池mix'
 @sv.on_prefix(('切换卡池', '选择卡池', '切換卡池', '選擇卡池'))
 async def set_pool(bot, ev: CQEvent):
     if not priv.check_priv(ev, priv.ADMIN):
-        await bot.finish(ev, '只有群管理才能切换卡池', at_sender=True)
+        await bot.finish(ev, '只有群管理才能切换卡池哦~', at_sender=True)
     name = util.normalize_str(ev.message.extract_plain_text())
     if not name:
         await bot.finish(ev, POOL_NAME_TIP, at_sender=True)
-    elif name in ('国', '国服', 'cn'):
-        await bot.finish(ev, '请选择以下卡池\n> 选择卡池 b服\n> 选择卡池 台服')
-    elif name in ('b', 'b服', 'bl', 'bilibili'):
-        name = 'BL'
+    elif name in ('b', 'b服', 'bl', 'bilibili', '国', '国服', 'cn'):
+        name = 'CN'
     elif name in ('台', '台服', 'tw', 'sonet'):
         name = 'TW'
     elif name in ('日', '日服', 'jp', 'cy', 'cygames'):
@@ -91,6 +196,60 @@ async def set_pool(bot, ev: CQEvent):
     await bot.send(ev, f'卡池已切换为{name}池', at_sender=True)
     await gacha_info(bot, ev)
 
+@sv.on_prefix(('开启仓库', '启用仓库'))
+async def enable_colle(bot, ev: CQEvent):
+    if not priv.check_priv(ev, priv.SUPERUSER):
+        await bot.finish(ev, '测试功能，仅限主人使用哦', at_sender=True)
+    uid = str(ev.user_id)
+    _colle_enable[uid] = True
+    dump_colle_config()
+    await bot.send(ev, f'已开启仓库，首次开启需要\"建立仓库\"哦', at_sender=True)
+
+@sv.on_prefix(('关闭仓库', '禁用仓库'))
+async def disable_colle(bot, ev: CQEvent):
+    if not priv.check_priv(ev, priv.SUPERUSER):
+        await bot.finish(ev, '测试功能，仅限主人使用哦', at_sender=True)
+    uid = str(ev.user_id)
+    _colle_enable[uid] = False
+    dump_colle_config()
+    await bot.send(ev, f'已禁用仓库', at_sender=True)
+
+
+async def modify_colle(bot, ev: CQEvent, gacha_result):
+    name = ev.sender['nickname']
+    gm = GachaMaster(ev.user_id)
+    l = len(gacha_result)
+
+    try:
+        db = gm.get_colle()
+    except DatabaseError as e:
+        await bot.finish(ev, f'DatabaseError: {e.message}\nごめんなさい！嘤嘤嘤(〒︿〒)', at_sender=True)
+
+    if db:
+        colle = pickle.loads(db['colle'])
+        jewel = db['jewel']
+        hiishi = db['hiishi']
+
+        if jewel >= 150 * l:
+            jewel -= 150 * l
+
+            for c in gacha_result:
+                if c.name in colle:
+                    if c.star == 1:
+                        hiishi += 1
+                    elif c.star == 2:
+                        hiishi += 10
+                    else:
+                        hiishi += 100
+                else:
+                    colle[c.name] = c.star
+            colle = pickle.dumps(colle)
+            gm.mod_colle(colle, jewel, hiishi)
+        else:
+            await bot.finish(ev, JEWEL_EMPTY_NOTICE, at_sender=True)
+    else:
+        await bot.finish(ev, f'{name}君你还没有仓库，请使用\'建立仓库\'进行初始化')
+
 
 async def check_jewel_num(bot, ev: CQEvent):
     if not jewel_limit.check(ev.user_id):
@@ -104,34 +263,38 @@ async def check_tenjo_num(bot, ev: CQEvent):
 
 @sv.on_prefix(gacha_1_aliases, only_to_me=True)
 async def gacha_1(bot, ev: CQEvent):
-
+    
     await check_jewel_num(bot, ev)
     jewel_limit.increase(ev.user_id, 150)
 
     gid = str(ev.group_id)
     gacha = Gacha(_group_pool[gid])
-    chara, hiishi = gacha.gacha_one(gacha.up_prob, gacha.s3_prob, gacha.s2_prob)
-    silence_time = hiishi * 60
+    chara = gacha.gacha_one(gacha.up3_prob, gacha.up2_prob, gacha.up1_prob, gacha.s3_prob, gacha.s2_prob)
 
+    uid = str(ev.user_id)
+    if _colle_enable[uid]:
+        await modify_colle(bot, ev, [chara])
+            
     res = f'{chara.name} {"★"*chara.star}'
     if sv.bot.config.USE_CQPRO:
         res = f'{chara.icon.cqcode} {res}'
-
-    await silence(ev, silence_time)
+    
     await bot.send(ev, f'素敵な仲間が増えますよ！\n{res}', at_sender=True)
 
 
 @sv.on_prefix(gacha_10_aliases, only_to_me=True)
 async def gacha_10(bot, ev: CQEvent):
-    SUPER_LUCKY_LINE = 170
 
     await check_jewel_num(bot, ev)
     jewel_limit.increase(ev.user_id, 1500)
-
+    
     gid = str(ev.group_id)
     gacha = Gacha(_group_pool[gid])
-    result, hiishi = gacha.gacha_ten()
-    silence_time = hiishi * 6 if hiishi < SUPER_LUCKY_LINE else hiishi * 60
+    result = gacha.gacha_ten()
+
+    uid = str(ev.user_id)
+    if _colle_enable[uid]:
+        await modify_colle(bot, ev, result)
 
     if sv.bot.config.USE_CQPRO:
         res1 = chara.gen_team_pic(result[:5], star_slot_verbose=False)
@@ -149,10 +312,7 @@ async def gacha_10(bot, ev: CQEvent):
         res2 = ' '.join(result[5:])
         res = f'{res1}\n{res2}'
 
-    if hiishi >= SUPER_LUCKY_LINE:
-        await bot.send(ev, '恭喜海豹！おめでとうございます！')
-    await bot.send(ev, f'素敵な仲間が増えますよ！\n{res}\n', at_sender=True)
-    await silence(ev, silence_time)
+    await bot.send(ev, f'素敵な仲間が増えますよ！\n{res}', at_sender=True)
 
 
 @sv.on_prefix(gacha_300_aliases, only_to_me=True)
@@ -169,13 +329,17 @@ async def gacha_300(bot, ev: CQEvent):
     s2 = len(result['s2'])
     s1 = len(result['s1'])
 
+    uid = str(ev.user_id)
+    if _colle_enable[uid]:
+        await modify_colle(bot, ev, result['up'] + result['s3'] + result['s2'] + result['s1'])
+
     res = [*(result['up']), *(result['s3'])]
     random.shuffle(res)
     lenth = len(res)
     if lenth <= 0:
         res = "竟...竟然没有3★？！"
     else:
-        step = 4
+        step = 5
         pics = []
         for i in range(0, lenth, step):
             j = min(lenth, i + step)
@@ -215,8 +379,6 @@ async def gacha_300(bot, ev: CQEvent):
         msg.append("记忆碎片一大堆！您是托吧？")
 
     await bot.send(ev, '\n'.join(msg), at_sender=True)
-    silence_time = (100*up + 50*(up+s3) + 10*s2 + s1) * 1
-    await silence(ev, silence_time)
 
 
 @sv.on_prefix('氪金')
@@ -232,3 +394,4 @@ async def kakin(bot, ev: CQEvent):
             count += 1
     if count:
         await bot.send(ev, f"已为{count}位用户充值完毕！谢谢惠顾～")
+
