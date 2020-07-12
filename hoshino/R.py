@@ -58,3 +58,16 @@ def get(path, *paths):
 
 def img(path, *paths):
     return ResImg(os.path.join('img', path, *paths))
+
+def record(path, *path):
+    return ResRecord(os.path.join('record', path, *paths))
+
+class ResRecord(ResObj):
+    @property
+    def cqcode(self) -> MessageSegment:
+        try:
+            return MessageSegment.record(f'file:///{os.path.abspath(self.path)}')
+        except Exception as e:
+            hoshino.logger.exception(e)
+            return MessageSegment.text('[语音出错]')
+

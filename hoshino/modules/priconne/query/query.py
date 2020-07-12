@@ -5,9 +5,9 @@ from . import sv
 
 p1 = R.img('priconne/quick/r16-4-tw-0.png').cqcode
 p2 = R.img('priconne/quick/r16-4-tw-1.png').cqcode
-p4 = R.img('priconne/quick/r17-3-jp-1.png').cqcode
-p5 = R.img('priconne/quick/r17-3-jp-2.png').cqcode
-p6 = R.img('priconne/quick/r17-3-jp-3.png').cqcode
+p4 = R.img('priconne/quick/r17-4-1.png').cqcode
+p5 = R.img('priconne/quick/r17-4-2.png').cqcode
+p6 = R.img('priconne/quick/r17-4-3.png').cqcode
 p7 = R.img('priconne/quick/r8-3.jpg').cqcode
 
 @sv.on_rex(r'^(\*?([日台国陆b])服?([前中后]*)卫?)?rank(表|推荐|指南)?$')

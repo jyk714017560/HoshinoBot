@@ -24,6 +24,7 @@ async def chat_waifu(bot, ev):
         await bot.send(ev, R.img('laopo.jpg').cqcode)
     else:
         await bot.send(ev, 'mua~')
+        await bot.send(ev, R.record('mua.m4a').cqcode)
 
 
 @sv.on_fullmatch('老公', only_to_me=True)

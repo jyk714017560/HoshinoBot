@@ -95,6 +95,7 @@ async def add_colle(bot, ev: CQEvent):
         except DatabaseError as e:
             await bot.finish(ev, f'DatabaseError: {e.message}\nごめんなさい！嘤嘤嘤(〒︿〒)', at_sender=True)
         await bot.send(ev, f'恭喜{name}君的仓库建立成功~')
+        await list_colle(bot, ev)
 
 
 @sv.on_prefix('查看仓库')

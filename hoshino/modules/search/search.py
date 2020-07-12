@@ -15,8 +15,8 @@ try:
 except:
     import json
 
-sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False)
-search_limit = DailyNumberLimiter(5)
+sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False, manage_priv=priv.OWNER)
+search_limit = DailyNumberLimiter(15)
 lmt = FreqLimiter(5)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
@@ -43,8 +43,9 @@ async def search_mode_on(bot, ev: CQEvent):
     _search_user[uid] = True
     await bot.send(ev, '了解～请发送图片吧！\n如想退出搜索模式请发送“谢谢佩可”', at_sender=True)
     await asyncio.sleep(60)
-    _search_user[uid] = False
-    await bot.send(ev, '由于超时，已为您自动退出搜图模式，以后要记得说“谢谢佩可”来退出搜图模式噢', at_sender=True)
+    if not _search_user[uid]:
+        _search_user[uid] = False
+        await bot.send(ev, '由于超时，已为您自动退出搜图模式，以后要记得说“谢谢佩可”来退出搜图模式噢', at_sender=True)
 
 
 @sv.on_prefix('谢谢佩可')
