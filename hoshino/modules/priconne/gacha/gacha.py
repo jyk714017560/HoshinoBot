@@ -40,18 +40,18 @@ class Gacha(object):
             s1_prob = 1000 - s3_prob - s2_prob
         total_ = s3_prob + s2_prob + s1_prob
         pick = random.randint(1, total_)
-        if pick <= up3_prob:
-            for i in range(len(self.up)):
-                if self.up_star[i] == 3:
-                    return chara.fromname(self.up[i], 3)
-        elif pick <= up3_prob + up2_prob:
-            for i in range(len(self.up)):
-                if self.up_star[i] == 2:
-                    return chara.fromname(self.up[i], 2)
-        elif pick <= up3_prob + up2_prob + up1_prob:
-            for i in range(len(self.up)):
-                if self.up_star[i] == 1:
-                    return chara.fromname(self.up[i], 1)
+        up = self.up
+        up_star = self.up_star
+        up_prob = self.up_prob
+        if pick <= up3_prob + up2_prob + up1_prob:
+            if not s1_prob:
+                for i, star in enumerate(self.up_star):
+                    if star == 1:
+                        up_prob[i] = 0
+            name = random.choices(up, up_prob, k=1)[0]
+            i = up.index(name)
+            star = up_star[i]
+            return chara.fromname(name, star)
         elif pick <= s3_prob + up2_prob + up1_prob:
             return chara.fromname(random.choice(self.star3), 3)
         elif pick <= s3_prob + s2_prob + up1_prob:
