@@ -59,7 +59,7 @@ def get(path, *paths):
 def img(path, *paths):
     return ResImg(os.path.join('img', path, *paths))
 
-def record(path, *path):
+def record(path, *paths):
     return ResRecord(os.path.join('record', path, *paths))
 
 class ResRecord(ResObj):
