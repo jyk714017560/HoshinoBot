@@ -43,7 +43,7 @@ async def search_mode_on(bot, ev: CQEvent):
     _search_user[uid] = True
     await bot.send(ev, '了解～请发送图片吧！\n如想退出搜索模式请发送“谢谢佩可”', at_sender=True)
     await asyncio.sleep(60)
-    if not _search_user[uid]:
+    if _search_user[uid]:
         _search_user[uid] = False
         await bot.send(ev, '由于超时，已为您自动退出搜图模式，以后要记得说“谢谢佩可”来退出搜图模式噢', at_sender=True)
 
@@ -67,12 +67,12 @@ async def search_pic(bot, ev: CQEvent):
     if not _search_user[uid]:
         return
 
+    if not ev['message'][0]['type'] == 'image':
+        return
+
     await check_search_num(bot, ev)
     search_limit.increase(ev.user_id, 1)
-
-    if not ev['message'][0]['type'] == 'image':
-        await bot.finish(ev, '必须要发送图片我才能帮你找噢_(:3」」', at_sender=True)
-    
+  
     sm = SearchMaster(ev['message'][0]['data']['url'])
     saucenao, ascii2d_disable = sm.saucenao()
     await bot.send(ev, saucenao)
@@ -103,7 +103,7 @@ async def search_pic_one(bot, ev: CQEvent):
             img_url.append(m.data['url'])
 
     if not img_url:
-        await bot.send(ev, '请发送"搜图"+图片')
+        await bot.send(ev, '必须要发送"搜图"+图片我才能帮你找噢_(:3」」')
         return
 
     for u in img_url:

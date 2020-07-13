@@ -106,6 +106,19 @@ class SearchMaster(object):
                     illust_id = results['results'][0]['data']['nijie_id']
                     thumbnail = results['results'][0]['header']['thumbnail']
                     ext_url = results['results'][0]['data']['ext_urls'][0]
+                elif index_id == 12:
+                    #12->danbooru
+                    service_name = 'danbooru'
+                    illust_id = results['results'][0]['data']['source']
+                    member_name = results['results'][0]['data']['creator']
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]
+                elif index_id == 21:
+                     #21->Anime
+                    service_name = 'Anime'
+                    illust_id = results['results'][0]['data']['source']
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]                       
                 elif index_id == 34:
                     #34->da
                     service_name = 'da'
@@ -123,6 +136,19 @@ class SearchMaster(object):
                     f"{ext_url}",
                     f"https://pixiv.net/u/{member_id}"
                     ]
+                elif index_id == 12:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"creator: {member_name}",
+                    f"[CQ:image,file={thumbnail}]",
+                    f"{ext_url}",
+                    f"source: {illust_id}",
+                    ]
+                elif index_id == 21:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"source: {illust_id}",
+                    f"[CQ:image,file={thumbnail}]",
+                    f"{ext_url}",
+                    ]                    
                 else:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"[CQ:image,file={thumbnail}]",
