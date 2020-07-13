@@ -65,9 +65,7 @@ def record(path, *paths):
 class ResRecord(ResObj):
     @property
     def cqcode(self) -> MessageSegment:
-        try:
+        if hoshino.config.RES_PROTOCOL == 'http':
+            return MessageSegment.record(self.url)
+        elif hoshino.config.RES_PROTOCOL == 'file':
             return MessageSegment.record(f'file:///{os.path.abspath(self.path)}')
-        except Exception as e:
-            hoshino.logger.exception(e)
-            return MessageSegment.text('[语音出错]')
-
