@@ -53,9 +53,9 @@ async def nihaole(bot, ev):
     await bot.send(ev, '不许好，憋回去！')
     await util.silence(ev, 30)
 
-@sv.on_fullmatch(('色图', '涩图','瑟图' ))
-async def setu(bot, ev):
-    await bot.send(ev, f"色图功能升级中……\n{R.img('setu.jpg').cqcode}")
+@on_command('setu',aliases=('色图', '涩图','瑟图'))
+async def setu(session):
+    await session.send(f"色图功能升级中……\n{R.img('setu.jpg').cqcode}")
 
 
 # ============================================ #
