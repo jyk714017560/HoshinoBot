@@ -16,7 +16,7 @@ except:
     import json
 
 sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False, manage_priv=priv.OWNER)
-search_limit = DailyNumberLimiter(15)
+search_limit = DailyNumberLimiter(25)
 lmt = FreqLimiter(5)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
@@ -90,7 +90,7 @@ async def search_pic(bot, ev: CQEvent):
 async def search_pic_one(bot, ev: CQEvent):
     
     if not lmt.check(ev.user_id):
-        await bot.send(ev, f'乖，要懂得节制噢，搜图冷却中(剩余 {int(lmt.left_time(uid)) + 1}秒)', at_sender=True)
+        await bot.send(ev, f'乖，要懂得节制噢，搜图冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
         return
     lmt.start_cd(ev.user_id)
 
