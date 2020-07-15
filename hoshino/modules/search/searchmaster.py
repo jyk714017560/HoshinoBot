@@ -113,6 +113,11 @@ class SearchMaster(object):
                     member_name = results['results'][0]['data']['creator']
                     thumbnail = results['results'][0]['header']['thumbnail']
                     ext_url = results['results'][0]['data']['ext_urls'][0]
+                elif index_id == 18:
+                    #18->nhentai
+                    service_name = 'nhentai'
+                    member_name = results['results'][0]['data']['jp_name']
+                    thumbnail = results['results'][0]['header']['thumbnail']
                 elif index_id == 21:
                      #21->Anime
                     service_name = 'Anime'
@@ -143,6 +148,11 @@ class SearchMaster(object):
                     f"{ext_url}",
                     f"source: {illust_id}",
                     ]
+                elif index_id == 18:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"[CQ:image,file={thumbnail}]",
+                    f"{member_name}", 
+                    ]
                 elif index_id == 21:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"source: {illust_id}",
@@ -157,7 +167,7 @@ class SearchMaster(object):
                 return '\n'.join(msg), True
 
             else:
-                return f"相似度{results['results'][0]['header']['similarity']}%过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n自动使用 ascii2d 进行搜索", False
+                return f"SauceNAO相似度{results['results'][0]['header']['similarity']}%过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n自动使用 ascii2d 进行搜索", False
                 
         else:
             return '没有查询到相似图片……\n自动使用 ascii2d 进行搜索', False
