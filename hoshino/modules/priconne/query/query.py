@@ -3,8 +3,9 @@ from hoshino import util, R
 from hoshino.typing import CQEvent
 from . import sv
 
-p1 = R.img('priconne/quick/r16-5-tw-0.png').cqcode
-p2 = R.img('priconne/quick/r16-5-tw-1.png').cqcode
+p1 = R.img('priconne/quick/r16-5-tw-1.png').cqcode
+p2 = R.img('priconne/quick/r16-5-tw-2.png').cqcode
+p3 = R.img('priconne/quick/r16-5-tw-3.png').cqcode
 p4 = R.img('priconne/quick/r17-4-1.png').cqcode
 p5 = R.img('priconne/quick/r17-4-2.png').cqcode
 p6 = R.img('priconne/quick/r17-4-3.png').cqcode
@@ -31,7 +32,14 @@ async def rank_sheet(bot, ev):
             msg.append(str(p6))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_tw:
-        msg.append(f'R16-4 rank表：\n{p1}{p2}')
+        msg.append(f'R16-5 rank表：')
+        pos = match.group(3)
+        if not pos or '前' in pos:
+            msg.append(str(p1))
+        if not pos or '中' in pos:
+            msg.append(str(p2))
+        if not pos or '后' in pos:
+            msg.append(str(p3))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_cn:
         await bot.send(ev, '\n※B服当前仅开放至金装，r10前无需考虑卡rank\n※暂未发现公开的靠谱rank推荐表\n※装备强化消耗较多mana，如非前排建议不强化\n※关于卡r的原因可发送"bcr速查"研读【为何卡R卡星】一帖', at_sender=True)

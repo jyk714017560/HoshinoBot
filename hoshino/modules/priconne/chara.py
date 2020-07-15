@@ -162,6 +162,16 @@ class Chara:
         return res
 
 
+    @property
+    def card(self):
+        res = R.img(f'priconne/card/card_{self.id}61.png')
+        if not res.exist:
+            res = R.img(f'priconne/card/card_{self.id}31.png')
+        if not res.exist:
+            res = R.img(f'priconne/unit/icon_unit_{UNKNOWN}31.png')
+        return res
+
+
     def render_icon(self, size, star_slot_verbose=True) -> Image:
         try:
             pic = self.icon.open().convert('RGBA').resize((size, size), Image.LANCZOS)
