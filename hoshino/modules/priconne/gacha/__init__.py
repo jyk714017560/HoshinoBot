@@ -27,8 +27,8 @@ sv_help = '''
 [切换卡池] 更换模拟卡池
 '''.strip()
 sv = Service('gacha', help_=sv_help, bundle='pcr娱乐')
-jewel_limit = DailyNumberLimiter(6000)
-tenjo_limit = DailyNumberLimiter(3)
+jewel_limit = DailyNumberLimiter(7500)
+tenjo_limit = DailyNumberLimiter(5)
 
 JEWEL_EXCEED_NOTICE = f'你今天已经抽过{jewel_limit.max}钻了，欢迎明早5点后再来！'
 TENJO_EXCEED_NOTICE = f'你今天已经抽过{tenjo_limit.max}张天井券了，欢迎明早5点后再来！'
