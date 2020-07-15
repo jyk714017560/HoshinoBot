@@ -90,7 +90,7 @@ YUKARI_SHEET = f'''
 ※大圈是1动充电对象 PvP测试
 ※黄骑四号位例外较多
 ※对面羊驼或中后卫坦 有可能歪
-※我方羊驼算一号位'''
+※我方羊驼算一号位
 @sv.on_fullmatch(YUKARI_SHEET_ALIAS)
 async def yukari_sheet(bot, ev):
     await bot.send(ev, YUKARI_SHEET, at_sender=True)
