@@ -45,13 +45,12 @@ async def seina(bot, ev):
 @sv.on_fullmatch(('我有个朋友说他好了', '我朋友说他好了', ))
 async def ddhaole(bot, ev):
     await bot.send(ev, '那个朋友是不是你弟弟？')
-    await util.silence(ev, 30)
 
 
 @sv.on_fullmatch('我好了')
 async def nihaole(bot, ev):
     await bot.send(ev, '不许好，憋回去！')
-    await util.silence(ev, 30)
+    await util.silence(ev, 60)
 
 @on_command('setu', aliases=('色图', '涩图', '瑟图'), only_to_me=False)
 async def setu(session):

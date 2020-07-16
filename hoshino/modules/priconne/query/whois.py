@@ -27,10 +27,9 @@ async def whois(bot, ev: CQEvent):
     
     msg = ''
     if confi < 100:
-        lmt.start_cd(uid, 120)
         msg = f'兰德索尔似乎没有叫"{name}"的人...'
         await bot.send(ev, msg)
-        msg = f'\n您有{confi}%的可能在找{guess_name} '
+        msg = f'您有{confi}%的可能在找{guess_name} '
 
     if confi > 60:
         msg += f'{c.icon.cqcode} {c.name}'
@@ -56,10 +55,9 @@ async def fullcard(bot, ev: CQEvent):
     
     msg = ''
     if confi < 100:
-        lmt.start_cd(uid, 120)
         msg = f'兰德索尔似乎没有叫"{name}"的人...'
         await bot.send(ev, msg)
-        msg = f'\n您有{confi}%的可能在找{guess_name} '
+        msg = f'您有{confi}%的可能在找{guess_name} '
 
     if confi > 60:
         msg += f'{c.card.cqcode}'
