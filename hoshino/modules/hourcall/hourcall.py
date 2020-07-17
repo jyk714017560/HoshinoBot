@@ -1,24 +1,13 @@
 import pytz
 from datetime import datetime
 import hoshino
-from hoshino import Service
+from hoshino import Service, priv, R
 
-sv = Service('hourcall', enable_on_default=False, help_='时报')
-tz = pytz.timezone('Asia/Shanghai')
+sv = Service('hourcall', enable_on_default=False, visible=False, help_='时报')
 
-def get_hour_call():
-    """挑出一组时报，每日更换，一日之内保持相同"""
-    cfg = hoshino.config.hourcall
-    now = datetime.now(tz)
-    hc_groups = cfg.HOUR_CALLS_ON
-    g = hc_groups[ now.day % len(hc_groups) ]
-    return cfg.HOUR_CALLS[g]
+@sv.scheduled_job('cron', hour='17', minute='45')
+async def remlin():
+    bot = hoshino.get_bot()
+    img = R.img('remlin.png').cqcode
+    await bot.send_group_msg(group_id=336545118, message=f'[CQ:at,qq=3096515669]\n{img}')
 
-
-@sv.scheduled_job('cron', hour='*')
-async def hour_call():
-    now = datetime.now(tz)
-    if 2 <= now.hour <= 4:
-        return  # 宵禁 免打扰
-    msg = get_hour_call()[now.hour]
-    await sv.broadcast(msg, 'hourcall', 0)
