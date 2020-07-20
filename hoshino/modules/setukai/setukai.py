@@ -23,25 +23,26 @@ SETU_EXCEED_NOTICE = '你今天冲的太多辣，欢迎明早5点后再来！'
 # session.proxies = proxies
 
 sm = SetuMaster()
-p = threading.Thread(target=sm.setu_producer, args=(sv))
+p = threading.Thread(target=sm.setu_producer, args=(sv,))
+p.start()
 
 
-async def check_setu_num(session):
-    if not setu_limit.check(session.ctx.user_id):
-        await session.finish(SETU_EXCEED_NOTICE, at_sender=True)
+async def check_setu_num(bot, ev: CQEvent):
+    if not setu_limit.check(ev.user_id):
+        await bot.finish(SETU_EXCEED_NOTICE, at_sender=True)
 
 
-@on_command('setu', aliases=('色图测试','瑟图测试','涩图测试'))
-async def setu_one(session):
+@sv.on_fullmatch(('色图测试','瑟图测试','涩图测试'))
+async def setu_one(bot, ev: CQEvent):
     
-    if not lmt.check(session.ctx.user_id):
-        await session.send(f'乖，要懂得节制噢，涩图冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
+    if not lmt.check(ev.user_id):
+        await bot.send(f'乖，要懂得节制噢，涩图冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
         return
-    lmt.start_cd(session.ctx.user_id)
+    lmt.start_cd(ev.user_id)
 
-    await check_setu_num(session)
-    setu_limit.increase(session.ctx.user_id, 1)
+    await check_setu_num(bot, ev)
+    setu_limit.increase(ev.user_id, 1)
 
     setu = sm.setu_consumer(sv)
-    await session.send(setu)
+    await bot.send(setu)
 
