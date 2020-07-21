@@ -1,4 +1,4 @@
-class ClanBattleError(Exception):
+class GachaError(Exception):
     def __init__(self, msg, *msgs):
         self._msgs = [msg, *msgs]
 
@@ -10,5 +10,5 @@ class ClanBattleError(Exception):
         return str(self)
 
 
-class DatabaseError(ClanBattleError):
+class DatabaseError(GachaError):
     pass

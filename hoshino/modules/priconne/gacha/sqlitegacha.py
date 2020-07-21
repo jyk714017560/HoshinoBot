@@ -1,6 +1,5 @@
 import sqlite3
 import os
-import time
 import pickle
 
 from hoshino import logger
