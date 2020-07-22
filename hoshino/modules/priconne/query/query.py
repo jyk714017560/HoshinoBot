@@ -6,9 +6,9 @@ from . import sv
 p1 = R.img('priconne/quick/r16-5-tw-1.png').cqcode
 p2 = R.img('priconne/quick/r16-5-tw-2.png').cqcode
 p3 = R.img('priconne/quick/r16-5-tw-3.png').cqcode
-p4 = R.img('priconne/quick/r17-4-1.png').cqcode
-p5 = R.img('priconne/quick/r17-4-2.png').cqcode
-p6 = R.img('priconne/quick/r17-4-3.png').cqcode
+p4 = R.img('priconne/quick/r17-5-1.png').cqcode
+p5 = R.img('priconne/quick/r17-5-2.png').cqcode
+p6 = R.img('priconne/quick/r17-5-3.png').cqcode
 p7 = R.img('priconne/quick/r8-3.jpg').cqcode
 
 @sv.on_rex(r'^(\*?([日台国陆b])服?([前中后]*)卫?)?rank(表|推荐|指南)?$')
@@ -22,7 +22,7 @@ async def rank_sheet(bot, ev):
         return
     msg = []
     if is_jp:
-        msg.append('R17-4 rank表：')
+        msg.append('R17-5 rank表：')
         pos = match.group(3)
         if not pos or '前' in pos:
             msg.append(str(p4))
