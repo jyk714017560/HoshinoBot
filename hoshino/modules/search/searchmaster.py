@@ -20,9 +20,11 @@ def getShareText(baseURL, titletype: str):
         if not link:
             continue
         title = link[0]
+        if len(link) < 2:
+            continue
         author = link[1]
         if not title['href']:
-            return '由未知错误导致搜索失败'
+            return f'由未知错误导致{titletype}搜索失败'
 
         Author = f"Author:{author['href']}" if author['href'] else ''
         msg = [f"ascii2d {titletype}",
@@ -139,7 +141,7 @@ class SearchMaster(object):
                     f"{title}/{member_name}",
                     f"[CQ:image,file={thumbnail}]",
                     f"{ext_url}",
-                    f"https://pixiv.net/u/{member_id}"
+                    f"author_url: https://pixiv.net/u/{member_id}"
                     ]
                 elif index_id == 12:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
@@ -167,7 +169,7 @@ class SearchMaster(object):
                 return '\n'.join(msg), True
 
             else:
-                return f"SauceNAO相似度{results['results'][0]['header']['similarity']}%过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n自动使用 ascii2d 进行搜索", False
+                return f"SauceNAO相似度{results['results'][0]['header']['similarity']}%过低……\n自动使用 ascii2d 进行搜索", False
                 
         else:
             return '没有查询到相似图片……\n自动使用 ascii2d 进行搜索', False

@@ -27,7 +27,7 @@ except FileNotFoundError as e:
 quene = Queue()
 for setu in _setu_quene:
     quene.put(setu)
-logger.info(f'initial {quene.qsize} setu is put into the main thread')
+logger.info(f'initial {quene.qsize()} setu is put into the main thread')
 
 
 def dump_setu_config():
@@ -58,7 +58,7 @@ def get_setu():
             r = session.get(url=pic_url)
         except (requests.exceptions.RequestException) as e:
             logger.warning(f'[pixiv.cat connect failed]{e}')
-            return []
+            continue
 
         pic = Image.open(BytesIO(r.content))
         pic = pic.convert('RGB')
@@ -76,13 +76,15 @@ def setu_producer():
                 quene.put(setu)
                 _setu_quene.append(setu)
             dump_setu_config()
-            logger.info('色图生产')
+            logger.info(f'{len(setu_list)} setu is put into the main thread')
 
     
 def setu_consumer():
+    if quene.empty():
+        return '色图库正在补充，请稍候再冲'
     setu = quene.get()
     _setu_quene.pop(1)
-    logger.info('色图消费')
+    logger.info('1 setu is take out from the main thread')
     pid = setu['pid']
     title = setu['title']
     tags = setu['tags']
@@ -90,7 +92,7 @@ def setu_consumer():
     msg = [
     f"{title}/{author}",
     f"{R.img('setu/', f'{title}.jpg').cqcode}",
-    f"author: https://pixiv.net/i/{pid}",
+    f"https://pixiv.net/i/{pid}",
     f"{tags[:3]}"
     ]   
     return '\n'.join(msg)
