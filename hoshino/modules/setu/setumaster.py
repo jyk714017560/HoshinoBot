@@ -4,6 +4,7 @@ import requests
 from PIL import Image
 from queue import Queue
 import threading
+import time
 
 try:
     import ujson as json
@@ -14,7 +15,7 @@ from hoshino import R, logger
 
 
 session = requests.session()
-apikey = '755900855ee1ef2a628723'
+apikey = '435221525ed48358ebab15'
 
 _setu_quene_file = os.path.expanduser('~/.hoshino/setu_quene_config.json')
 _setu_quene = []
@@ -77,23 +78,25 @@ def setu_producer():
                 _setu_quene.append(setu)
             dump_setu_config()
             logger.info(f'{len(setu_list)} setu is put into the main thread')
+        time.sleep(60)
 
     
 def setu_consumer():
     if quene.empty():
         return '色图库正在补充，请稍候再冲'
     setu = quene.get()
-    _setu_quene.pop(1)
+    _setu_quene.pop(0)
+    dump_setu_config()
     logger.info('1 setu is take out from the main thread')
     pid = setu['pid']
     title = setu['title']
     tags = setu['tags']
     author = setu['author']
     msg = [
-    f"{title}/{author}",
+    f"标题: {title}",
+    f"画师: {author}",
     f"{R.img('setu/', f'{title}.jpg').cqcode}",
-    f"https://pixiv.net/i/{pid}",
-    f"{tags[:3]}"
+    f"源地址: https://pixiv.net/i/{pid}"
     ]   
     return '\n'.join(msg)
 

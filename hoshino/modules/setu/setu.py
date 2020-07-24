@@ -10,11 +10,11 @@ _flmt = FreqLimiter(15)
 
 SETU_EXCEED_NOTICE = '你今天冲的太多辣，欢迎明早5点后再来！'
 
-@sv.on_fullmatch(('色图', '瑟图', '涩图'))
+@sv.on_rex(r'^来?[份点张]?[涩色瑟]图$')
 async def setu_one(bot, ev: CQEvent):
     
     if not _flmt.check(ev.user_id):
-        await bot.send(ev, f'乖，要懂得节制噢，涩图冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
+        await bot.send(ev, f'乖，要懂得节制噢，涩图冷却中(剩余 {int(_flmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
         return
     if not _nlmt.check(ev.user_id):
         await bot.send(ev, SETU_EXCEED_NOTICE, at_sender=True)
