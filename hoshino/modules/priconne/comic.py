@@ -106,8 +106,12 @@ async def update_seeker():
     index = load_index()
 
     # 获取最新漫画信息
-    resp = await aiorequests.get(index_api, timeout=10)
-    data = await resp.json()
+    try:
+        resp = await aiorequests.get(index_api, timeout=10)
+        data = await resp.json()
+    except Exception as e:
+        sv.logger.exception(e)
+        return
     id_ = data['latest_cartoon']['id']
     episode = data['latest_cartoon']['episode_num']
     title = data['latest_cartoon']['title']

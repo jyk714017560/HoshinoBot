@@ -26,9 +26,9 @@ def getShareText(baseURL, titletype: str):
         if not title['href']:
             return f'由未知错误导致{titletype}搜索失败'
 
-        Author = f"Author:{author['href']}" if author['href'] else ''
+        Author = f"Author: {author['href']}" if author['href'] else ''
         msg = [f"ascii2d {titletype}",
-        f"{title.string}/{author.string}",
+        f"「{title.string}」/「{author.string}」",
         f"[CQ:image,file=https://ascii2d.net{str(img.img['src'])}]",
         f"{title['href']}",
         f"{Author}"
@@ -138,29 +138,23 @@ class SearchMaster(object):
 
                 if index_id == 5 or index_id == 6:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
-                    f"{title}/{member_name}",
+                    f"「{title}」/「{member_name}」",
                     f"[CQ:image,file={thumbnail}]",
                     f"{ext_url}",
-                    f"author_url: https://pixiv.net/u/{member_id}"
+                    f"Author: https://pixiv.net/u/{member_id}"
                     ]
                 elif index_id == 12:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
-                    f"creator: {member_name}",
+                    f"画师: {member_name}",
                     f"[CQ:image,file={thumbnail}]",
                     f"{ext_url}",
-                    f"source: {illust_id}",
+                    f"源地址: {illust_id if illust_id else '啊这，源地址被吃了呢~'}",
                     ]
                 elif index_id == 18:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"[CQ:image,file={thumbnail}]",
-                    f"{member_name}", 
-                    ]
-                elif index_id == 21:
-                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
-                    f"source: {illust_id}",
-                    f"[CQ:image,file={thumbnail}]",
-                    f"{ext_url}",
-                    ]                    
+                    f"{member_name}",
+                    ]            
                 else:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"[CQ:image,file={thumbnail}]",

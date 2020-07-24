@@ -2,7 +2,6 @@ import os
 from io import BytesIO
 import requests
 from PIL import Image
-from queue import Queue
 import threading
 import time
 
@@ -15,25 +14,21 @@ from hoshino import R, logger
 
 
 session = requests.session()
-apikey = '435221525ed48358ebab15'
+apikey = '755900855ee1ef2a628723'
 
 _setu_quene_file = os.path.expanduser('~/.hoshino/setu_quene_config.json')
-_setu_quene = []
+_setu_list = []
 try:
     with open(_setu_quene_file, encoding='utf8') as f:
-        _setu_quene = json.load(f)
+        _setu_list = json.load(f)
+        logger.info(f'initial {len(_setu_list)} setu is put into the setu list')
 except FileNotFoundError as e:
     logger.warning('setu_quene_config.json not found, will create when needed.')
-   
-quene = Queue()
-for setu in _setu_quene:
-    quene.put(setu)
-logger.info(f'initial {quene.qsize()} setu is put into the main thread')
 
 
 def dump_setu_config():
     with open(_setu_quene_file, 'w', encoding='utf8') as f:
-        json.dump(_setu_quene, f, ensure_ascii=False)
+        json.dump(_setu_list, f, ensure_ascii=False)
 
 
 def get_setu():
@@ -45,9 +40,9 @@ def get_setu():
         'size1200': True
     }
     try:
-        r = session.get(url=url, params=params)
+        r = session.get(url=url, params=params, timeout=10)
     except (requests.exceptions.RequestException) as e:
-        logger.warning(f'[lolicon.app connect failed]{e}')
+        logger.error(f'[lolicon.app connect failed]{e}')
         return []
     
     results = r.json()
@@ -56,9 +51,9 @@ def get_setu():
         title = setu['title']
         pic_url = setu['url']
         try:
-            r = session.get(url=pic_url)
+            r = session.get(url=pic_url, timeout=10)
         except (requests.exceptions.RequestException) as e:
-            logger.warning(f'[pixiv.cat connect failed]{e}')
+            logger.error(f'[pixiv.cat connect failed]{e}')
             continue
 
         pic = Image.open(BytesIO(r.content))
@@ -71,23 +66,21 @@ def get_setu():
 
 def setu_producer():
     while True:
-        if quene.qsize() < 5:
+        if len(_setu_list) < 10:
             setu_list = get_setu()
             for setu in setu_list:
-                quene.put(setu)
-                _setu_quene.append(setu)
+                _setu_list.append(setu)
             dump_setu_config()
-            logger.info(f'{len(setu_list)} setu is put into the main thread')
-        time.sleep(60)
+            logger.info(f'{len(setu_list)} setu is put into the setu list')
+        time.sleep(30)
 
     
 def setu_consumer():
-    if quene.empty():
+    if not _setu_list:
         return '色图库正在补充，请稍候再冲'
-    setu = quene.get()
-    _setu_quene.pop(0)
+    setu = _setu_list.pop(0)
     dump_setu_config()
-    logger.info('1 setu is take out from the main thread')
+    logger.info('1 setu is take out from the setu list')
     pid = setu['pid']
     title = setu['title']
     tags = setu['tags']
@@ -100,5 +93,4 @@ def setu_consumer():
     ]   
     return '\n'.join(msg)
 
-p = threading.Thread(target=setu_producer)
-p.start()
+threading.Thread(name='Thread-setu', target=setu_producer).start()
