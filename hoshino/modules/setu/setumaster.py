@@ -154,9 +154,9 @@ def get_pixivSuggestions(keyword):
         logger.error(f'[pixivic.com/pixivSuggestions connect failed]{e}')
         return ''
     results = r.json()
-    msg = ['\n如果这不是你要找的图，可以试试以下几个关键词']
+    msg = ['\n如果这不是你要找的图，可以试试以下几个关键词:']
     if not 'data' in results:
         return ''
     for suggestion in results['data'][:3]:
-        msg.append(suggestion['keyword'])
+        msg.append(f"来份{suggestion['keyword']}色图")
     return '\n'.join(msg)
