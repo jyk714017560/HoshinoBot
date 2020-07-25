@@ -2,7 +2,7 @@ from hoshino.typing import *
 from hoshino import Service, priv
 from hoshino.util import FreqLimiter, DailyNumberLimiter
 
-from .setumaster import setu_consumer
+from .setumaster import setu_consumer, get_setu_keyword, get_pixivSuggestions
 
 sv = Service('setu', visible=False)
 _nlmt = DailyNumberLimiter(25)
@@ -10,7 +10,7 @@ _flmt = FreqLimiter(15)
 
 SETU_EXCEED_NOTICE = '你今天冲的太多辣，欢迎明早5点后再来！'
 
-@sv.on_rex(r'^来?[份点张]?[涩色瑟]图$')
+@sv.on_rex(r'^来?[份点张]?(.{0,20})[涩色瑟]图(.{0,20})$')
 async def setu_one(bot, ev: CQEvent):
     
     if not _flmt.check(ev.user_id):
@@ -21,6 +21,16 @@ async def setu_one(bot, ev: CQEvent):
         return
     _flmt.start_cd(ev.user_id)
     _nlmt.increase(ev.user_id, 1)
+
+    keyword = ev['match'].group(1)  if ev['match'].group(1) else ev['match'].group(2)
+
+    if keyword:
+        msg = get_setu_keyword(keyword)
+        await bot.send(ev, msg)
+        suggestion = get_pixivSuggestions(keyword)
+        if suggestion:
+            await bot.send(ev, suggestion, at_sender=True)
+        return
 
     msg = setu_consumer()
     await bot.send(ev, msg)
