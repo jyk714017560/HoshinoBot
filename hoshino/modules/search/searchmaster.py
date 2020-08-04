@@ -148,7 +148,7 @@ class SearchMaster(object):
                     f"画师: {member_name}",
                     f"[CQ:image,file={thumbnail}]",
                     f"{ext_url}",
-                    f"源地址: {illust_id if illust_id else '啊这，源地址被吃了呢~'}",
+                    f"源地址: {illust_id if illust_id else '吧唧吧唧，源地址被吃了呢~'}",
                     ]
                 elif index_id == 18:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
