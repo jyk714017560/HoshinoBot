@@ -3,12 +3,13 @@ import time
 from collections import defaultdict
 import asyncio
 
-from nonebot import MessageSegment
+import hoshino
 from hoshino import Service, priv, util
 from hoshino.typing import *
 from hoshino.util import DailyNumberLimiter, FreqLimiter
 
 from .searchmaster import SearchMaster
+from .pixivmaster import *
 
 try:
     import ujson as json
@@ -17,7 +18,7 @@ except:
 
 sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False, manage_priv=priv.OWNER)
 search_limit = DailyNumberLimiter(25)
-lmt = FreqLimiter(5)
+lmt = FreqLimiter(10)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
 SIMILARITY = 50
@@ -84,8 +85,6 @@ async def search_pic(bot, ev: CQEvent):
     await bot.send(ev, bovw)
 
 
-
-
 @sv.on_prefix('搜图')
 async def search_pic_one(bot, ev: CQEvent):
     
@@ -97,26 +96,42 @@ async def search_pic_one(bot, ev: CQEvent):
     await check_search_num(bot, ev)
     search_limit.increase(ev.user_id, 1)
 
-    img_url = []
-    for m in ev.message:
-        if m.type == 'image':
-            img_url.append(m.data['url'])
-
-    if not img_url:
-        await bot.send(ev, '必须要发送"搜图"+图片我才能帮你找噢_(:3」」')
-        return
-
-    for u in img_url:
-        sm = SearchMaster(u)
+    m = ev.message[0]
+    if m.type == 'image':
+        img_url = ev.message[0].data['url']
+        sm = SearchMaster(img_url)
         saucenao, ascii2d_disable = sm.saucenao()
         await bot.send(ev, saucenao)
 
         if ascii2d_disable:
-            continue
+            return
         color, bovw = sm.ascii2d()
-        await bot.send(ev, color)
-        await bot.send(ev, bovw)
+        color_ret = await bot.send(ev, color)
+        bovw_ret = await bot.send(ev, bovw)
+        await asyncio.sleep(60)
+        await delete_msg(ev, color_ret)
+        await delete_msg(ev, bovw_ret)
 
-        
-    
+    elif m.type == 'text':
+        keyword = ev.message[0].data['text']
+        if not keyword:
+            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 搜图+图片: 以图搜图\n> 搜图+关键字: 关键字搜图\n> 功能优化中……_(:3」」', at_sender=True)
+            return
+        try:
+            t = PixivicThread(pixivic_keyword, args=keyword)
+            t.start()
+            t.join()
+            msg = t.get_result()
+            await bot.send(ev, msg, at_sender=True)
+        except:
+            await bot.send(ev, '由未知错误导致搜图失败QAQ', at_sender=True)
 
+    else:
+        await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 搜图+图片: 以图搜图\n> 搜图+关键字: 关键字搜图\n> 功能优化中……_(:3」」', at_sender=True)
+        return
+
+async def delete_msg(ev: CQEvent, ret):
+    try:
+        await hoshino.get_bot().delete_msg(self_id=ev.self_id, message_id=ret['message_id'])
+    except:
+        return

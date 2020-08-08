@@ -2,7 +2,7 @@ from hoshino.typing import *
 from hoshino import Service, priv
 from hoshino.util import FreqLimiter, DailyNumberLimiter
 
-from .setumaster import setu_consumer, get_setu_keyword, get_pixivSuggestions
+from .setumaster import *
 
 sv = Service('setu', visible=False)
 _nlmt = DailyNumberLimiter(25)
@@ -22,17 +22,14 @@ async def setu_one(bot, ev: CQEvent):
     _flmt.start_cd(ev.user_id)
     _nlmt.increase(ev.user_id, 1)
 
-    # keyword = ev['match'].group(1)  if ev['match'].group(1) else ev['match'].group(2)
-
-    # if keyword:
-    #     _flmt.start_cd(ev.user_id,60)
-    #     msg = await get_setu_keyword(keyword)
-    #     await bot.send(ev, msg, at_sender=True)
-    #     suggestion = await get_pixivSuggestions(keyword)
-    #     if suggestion:
-    #         await bot.send(ev, suggestion, at_sender=True)
-    #     return
-
-    msg = setu_consumer()
+    msg = await setu_consumer()
     await bot.send(ev, msg)
 
+
+@sv.on_fullmatch('涩图重启')
+async def reset_setu(bot, ev: CQEvent):
+
+    if not priv.check_priv(ev, priv.ADMIN):
+        return
+    msg = setu_reset()
+    await bot.send(ev, msg)
