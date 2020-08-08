@@ -29,7 +29,7 @@ async def whois(bot, ev: CQEvent):
     
     msg = ''
     if guess:
-        msg = f'兰德索尔似乎没有叫"{name}"的人...\n角色别称补全计划: github.com/Ice-Cirno/HoshinoBot/issues/5'
+        msg = f'兰德索尔似乎没有叫"{name}"的人...'
         await bot.send(ev, msg)
         msg = f'您有{confi}%的可能在找{guess_name} '
 
