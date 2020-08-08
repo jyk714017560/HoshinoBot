@@ -50,7 +50,7 @@ class SearchMaster(object):
         params = {
             'output_type': 2,
             'numers': 1,
-            'minsim': '80!',
+            'minsim': '70!',
             'db': 999,
             'api_key': api_key,
             'url': self.url,

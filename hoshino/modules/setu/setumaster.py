@@ -11,11 +11,11 @@ try:
 except:
     import json
 
-from hoshino import R, logger
+from hoshino import aiorequests, R, logger
 
 
 session = requests.session()
-apikey = '755900855ee1ef2a628723'
+apikey = '435221525ed48358ebab15'
 
 _setu_quene_file = os.path.expanduser('~/.hoshino/setu_quene_config.json')
 _setu_list = []
@@ -57,9 +57,9 @@ def get_setu():
             logger.error(f'[pixiv.cat connect failed]{e}')
             continue
 
-        pic = Image.open(BytesIO(r.content))
-        pic = pic.convert('RGB')
         try:
+            pic = Image.open(BytesIO(r.content))
+            pic = pic.convert('RGB')
             pic.save(R.img('setu/', f'{title}.jpg').path)
         except OSError as e:
             logger.error(f'[pic save failed]{e}')
@@ -100,7 +100,7 @@ def setu_consumer():
 
 threading.Thread(name='Thread-setu', target=setu_producer).start()
 
-def get_setu_keyword(keyword):
+async def get_setu_keyword(keyword):
     url = 'https://api.pixivic.com/illustrations'
     params = {
         'illustType': 'illust',
@@ -139,14 +139,14 @@ def get_setu_keyword(keyword):
         logger.error(f'[pic save failed]{e}')
         return '涩图太涩，发不出去勒...'
     msg = [
-    f"标题: {title}",
+    f"\n标题: {title}",
     f"画师: {author}",
     f"{R.img('setu/keyword/', f'{title}.jpg').cqcode}",
     f"源地址: https://pixiv.net/i/{pid}"
     ]  
     return '\n'.join(msg)
 
-def get_pixivSuggestions(keyword):
+async def get_pixivSuggestions(keyword):
     url = f'https://api.pixivic.com/keywords/{keyword}/pixivSuggestions'
     try:
         r = session.get(url=url, timeout=10)

@@ -10,7 +10,7 @@ _flmt = FreqLimiter(15)
 
 SETU_EXCEED_NOTICE = '你今天冲的太多辣，欢迎明早5点后再来！'
 
-@sv.on_rex(r'^来?[份点张]?(.{0,20})[涩色瑟]图(.{0,20})$')
+@sv.on_rex(r'^来?[份点张]?[涩色瑟]图$')
 async def setu_one(bot, ev: CQEvent):
     
     if not _flmt.check(ev.user_id):
@@ -22,15 +22,16 @@ async def setu_one(bot, ev: CQEvent):
     _flmt.start_cd(ev.user_id)
     _nlmt.increase(ev.user_id, 1)
 
-    keyword = ev['match'].group(1)  if ev['match'].group(1) else ev['match'].group(2)
+    # keyword = ev['match'].group(1)  if ev['match'].group(1) else ev['match'].group(2)
 
-    if keyword:
-        msg = get_setu_keyword(keyword)
-        await bot.send(ev, msg)
-        suggestion = get_pixivSuggestions(keyword)
-        if suggestion:
-            await bot.send(ev, suggestion, at_sender=True)
-        return
+    # if keyword:
+    #     _flmt.start_cd(ev.user_id,60)
+    #     msg = await get_setu_keyword(keyword)
+    #     await bot.send(ev, msg, at_sender=True)
+    #     suggestion = await get_pixivSuggestions(keyword)
+    #     if suggestion:
+    #         await bot.send(ev, suggestion, at_sender=True)
+    #     return
 
     msg = setu_consumer()
     await bot.send(ev, msg)
