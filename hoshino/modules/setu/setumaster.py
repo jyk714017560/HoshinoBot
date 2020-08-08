@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 import requests
-from PIL import Image
+from PIL import Image, ImageFile
 import threading
 import time
 import random
@@ -13,6 +13,7 @@ except:
 
 from hoshino import R, logger
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 session = requests.session()
 apikey = '755900855ee1ef2a628723'
@@ -52,7 +53,7 @@ def get_setu():
         title = setu['title']
         pic_url = setu['url']
         try:
-            r = session.get(url=pic_url, timeout=10)
+            r = session.get(url=pic_url, timeout=20)
         except (requests.exceptions.RequestException) as e:
             logger.error(f'[pixiv.cat connect failed]{e}')
             continue
@@ -80,7 +81,7 @@ def setu_producer():
         time.sleep(30)
 
     
-def setu_consumer():
+async def setu_consumer():
     if not _setu_list:
         return '色图库正在补充，请稍候再冲'
     setu = _setu_list.pop(0)
@@ -98,65 +99,12 @@ def setu_consumer():
     ]   
     return '\n'.join(msg)
 
-threading.Thread(name='Thread-setu', target=setu_producer).start()
+thread = threading.Thread(name='Thread-setu', target=setu_producer)
+thread.start()
 
-def get_setu_keyword(keyword):
-    url = 'https://api.pixivic.com/illustrations'
-    params = {
-        'illustType': 'illust',
-        'searchType': 'original',
-        'maxSanityLevel': 4,
-        'page': 1,
-        'pageSize': 30,
-        'keyword':keyword
-    }    
-    try:
-        r = session.get(url=url, params=params, timeout=10)
-    except (requests.exceptions.RequestException) as e:
-        logger.error(f'[pixivic.com/illustration connect failed]{e}')
-        return '搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次'
-    
-    results = r.json()
-    if not 'data' in results:
-        return '涩图太涩，发不出去勒...'
-    setu = random.choice(results['data'])
-    pid = setu['id']
-    title = setu['title']
-    author = setu['artistPreView']['name']
-    pic_url = setu['imageUrls'][0]['original']
-    pic_url = pic_url.replace('/i.pximg.net/', '/i.pixiv.cat/')
-    try:
-        r = session.get(url=pic_url, timeout=10)
-    except (requests.exceptions.RequestException) as e:
-        logger.error(f'[pixiv.cat connect failed]{e}')
-        return '瑟图服务器爆炸惹_(:3」∠)_'
-
-    pic = Image.open(BytesIO(r.content))
-    pic = pic.convert('RGB')
-    try:
-        pic.save(R.img('setu/keyword/', f'{title}.jpg').path)
-    except OSError as e:
-        logger.error(f'[pic save failed]{e}')
-        return '涩图太涩，发不出去勒...'
-    msg = [
-    f"标题: {title}",
-    f"画师: {author}",
-    f"{R.img('setu/keyword/', f'{title}.jpg').cqcode}",
-    f"源地址: https://pixiv.net/i/{pid}"
-    ]  
-    return '\n'.join(msg)
-
-def get_pixivSuggestions(keyword):
-    url = f'https://api.pixivic.com/keywords/{keyword}/pixivSuggestions'
-    try:
-        r = session.get(url=url, timeout=10)
-    except (requests.exceptions.RequestException) as e:
-        logger.error(f'[pixivic.com/pixivSuggestions connect failed]{e}')
-        return ''
-    results = r.json()
-    msg = ['\n如果这不是你要找的图，可以试试以下几个关键词:']
-    if not 'data' in results:
-        return ''
-    for suggestion in results['data'][:3]:
-        msg.append(f"来份{suggestion['keyword']}色图")
-    return '\n'.join(msg)
+def setu_reset():
+    if thread.isAlive():
+        return "涩图服务运行正常"
+    else:
+        thread.start()
+        return "重启涩图成功"
