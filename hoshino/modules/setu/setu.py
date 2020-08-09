@@ -24,6 +24,8 @@ async def setu_one(bot, ev: CQEvent):
 
     msg = await setu_consumer()
     await bot.send(ev, msg)
+    if random.random() < 0.02:
+        await bot.send(ev, f"{R.img('色图.gif').cqcode}")
 
 
 @sv.on_fullmatch('涩图重启')

@@ -11,7 +11,7 @@ try:
 except:
     import json
 
-from hoshino import aiorequests, R, logger
+from hoshino import R, logger
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
