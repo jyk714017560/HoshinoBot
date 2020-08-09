@@ -6,7 +6,7 @@ from hoshino import R, Service, priv, util
 
 
 # basic function for debug, not included in Service('chat')
-@on_command('zai?', aliases=('在?', '在？', '在吗', '在么？', '在嘛', '在嘛？'，'佩可在？'), only_to_me=True)
+@on_command('zai?', aliases=('在?', '在？', '在吗', '在么？', '在嘛', '在嘛？','佩可在？'), only_to_me=True)
 async def say_hello(session):
     await session.send('はい！私はいつも貴方の側にいますよ！')
 
