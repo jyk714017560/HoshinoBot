@@ -5,6 +5,7 @@ from PIL import Image, ImageFile
 import threading
 import time
 import random
+import datetime
 
 try:
     import ujson as json
@@ -61,7 +62,13 @@ def get_setu():
         try:
             pic = Image.open(BytesIO(r.content))
             pic = pic.convert('RGB')
-            pic.save(R.img('setu/', f'{title}.jpg').path)
+            title = title.replace('/','-')
+            date = datetime.datetime.now().strftime('%Y%m%d')
+            setu['date'] = date
+            datePath = f'/home/res/img/setu/{date}'
+            if not os.path.exists(datePath):
+                os.makedirs(datePath)
+            pic.save(R.img(f'setu/{date}/', f'{title}.jpg').path)
         except OSError as e:
             logger.error(f'[pic save failed]{e}')
             continue
@@ -91,10 +98,11 @@ async def setu_consumer():
     title = setu['title']
     tags = setu['tags']
     author = setu['author']
+    date = setu['date']
     msg = [
     f"标题: {title}",
     f"画师: {author}",
-    f"{R.img('setu/', f'{title}.jpg').cqcode}",
+    f"{R.img(f'setu/{date}/', f'{title}.jpg').cqcode}",
     f"源地址: https://pixiv.net/i/{pid}"
     ]   
     return '\n'.join(msg)

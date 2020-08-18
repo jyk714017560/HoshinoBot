@@ -16,7 +16,7 @@ try:
 except:
     import json
 
-sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False, manage_priv=priv.OWNER)
+sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=True, visible=False)
 search_limit = DailyNumberLimiter(25)
 lmt = FreqLimiter(10)
 

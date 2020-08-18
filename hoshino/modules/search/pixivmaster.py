@@ -5,6 +5,7 @@ from PIL import Image
 import threading
 import time
 import random
+import datetime
 
 try:
     import ujson as json
@@ -49,14 +50,19 @@ def pixivic_keyword(keyword):
     try:
         pic = Image.open(BytesIO(r.content))
         pic = pic.convert('RGB')
-        pic.save(R.img('setu/keyword/', f'{title}.jpg').path)
+        title = title.replace('/','-')
+        date = datetime.datetime.now().strftime('%Y%m%d')
+        datePath = f'/home/res/img/setu/keyword/{date}'
+        if not os.path.exists(datePath):
+            os.makedirs(datePath)
+        pic.save(R.img(f'setu/keyword/{date}/', f'{title}.jpg').path)
     except OSError as e:
         logger.error(f'[pic save failed]{e}')
         return '涩图太涩，发不出去勒...'
     msg = [
     f"标题: {title}",
     f"画师: {author}",
-    f"{R.img('setu/keyword/', f'{title}.jpg').cqcode}",
+    f"{R.img(f'setu/keyword/{date}/', f'{title}.jpg').cqcode}",
     f"源地址: https://pixiv.net/i/{pid}"
     ]  
     return '\n'.join(msg)

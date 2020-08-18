@@ -12,7 +12,7 @@ from hoshino import Service, R, logger
 from hoshino.modules.priconne import chara
 from hoshino.util import pic2b64
 
-sv = Service('game', help_='[猜语音] 猜猜随机的语音来自哪位角色\n[猜卡面] 猜猜这部分卡面来自哪位角色', bundle='pcr娱乐', enable_on_default=True, visible=True)
+sv = Service('game', help_='[猜语音] 猜猜随机的语音来自哪位角色\n[猜卡面] 猜猜截取的卡面来自哪位角色', bundle='pcr娱乐', enable_on_default=True, visible=True)
 
 GAME_POOL = ('voiceguess', 'cardguess', 'baseball', 'racing')
 ONE_TURN_TIME = 30
@@ -26,7 +26,7 @@ _group_parameter = {}
 voicepath = os.path.join(hoshino.config.RES_DIR, 'record/title')
 cardpath = os.path.join(hoshino.config.RES_DIR, 'img/priconne/card/')
 
-GAME_NAME_TIP = '请选择以下小游戏\n> 猜语音\n> 猜卡面（开发中）\n> 棒球（开发中）\n> 赛马（开发中）'
+GAME_NAME_TIP = '请选择以下小游戏\n> 猜语音\n> 猜卡面\n> 棒球（开发中）\n> 赛马（开发中）'
 @sv.on_fullmatch(('小游戏'))
 async def game_start(bot, ev: CQEvent):
     
@@ -39,6 +39,9 @@ async def game_start(bot, ev: CQEvent):
 
 @sv.on_fullmatch(('猜语音'))
 async def voiceguess(bot, ev: CQEvent):
+
+    await bot.send(ev, '语音维护中,暂不开放 (•̀へ•╮)')
+    return
 
     if ev['message_type'] != 'group':
         await bot.send(ev, '小游戏仅支持群组游玩，好孩子要学会和伙伴一起玩哦~')
@@ -63,6 +66,7 @@ async def voiceguess(bot, ev: CQEvent):
             msg.append('很遗憾，没有人答对呢~')
             await bot.send(ev, '\n'.join(msg))
         else:
+            _group_winner[gid] = list(set(_group_winner[gid]))
             msg.append(f'ヤバイですね！一共有{len(_group_winner[gid])}人答对，他们是:')
             for n in _group_winner[gid]:
                 msg.append(str(n))
@@ -102,11 +106,13 @@ async def cardguess(bot, ev: CQEvent):
 
         await bot.send(ev, f'猜猜这张卡面来自哪位角色? ({ONE_TURN_TIME}s后公布答案)\n{res}')
         await asyncio.sleep(ONE_TURN_TIME)
-        msg = [f'锵锵，正确答案是: \n{c.card.cqcode}{c.name}']
+        imgcard = R.img(f'priconne/card/{card}').cqcode
+        msg = [f'锵锵，正确答案是: \n{imgcard}{c.name}']
         if not _group_winner[gid]:
             msg.append('很遗憾，没有人答对呢~')
             await bot.send(ev, '\n'.join(msg))
         else:
+            _group_winner[gid] = list(set(_group_winner[gid]))
             msg.append(f'ヤバイですね！一共有{len(_group_winner[gid])}人答对，他们是:')
             for n in _group_winner[gid]:
                 msg.append(str(n))
@@ -123,7 +129,7 @@ async def baseball(bot, ev: CQEvent):
     return
     if ev['message_type'] != 'group':
         await bot.send(ev, '小游戏仅支持群组游玩，好孩子要学会和伙伴一起玩哦~')
-        return    
+        return
 
 
 @sv.on_fullmatch(('赛马'))
