@@ -6,6 +6,8 @@ try:
 except:
     import json
 
+from hoshino import logger
+
 
 session = requests.session()
 
@@ -38,5 +40,22 @@ def music_keyword(keyword):
         return '没有版权，发不出去勒...'
     
     return MessageSegment.music_custom(url='https://game.granbluefantasy.jp/', audio_url=audioUrl, title=title, content=artist)
+
+
+class MusicThread(threading.Thread):
+
+    def __init__(self, func, args=()):
+        super(MusicThread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.result = self.func(self.args)
+
+    def get_result(self):
+        try:
+            return self.result
+        except Exception:
+            return None
 
     

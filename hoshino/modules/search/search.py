@@ -17,12 +17,11 @@ try:
 except:
     import json
 
-sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=True, visible=True)
+sv = Service('search', help_='[搜图+图片] 以图搜图\n[搜图+关键字] 关键字搜图\n[点歌+关键字] 关键字点歌', bundle='pcr娱乐', enable_on_default=True, visible=True)
 search_limit = DailyNumberLimiter(25)
 lmt = FreqLimiter(10)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
-SIMILARITY = 50
 
 _search_user = {}
 _search_user = defaultdict(lambda: False, _search_user)
@@ -145,17 +144,22 @@ async def search_music(bot, ev: CQEvent):
         return
     lmt.start_cd(ev.user_id)
 
-    await check_search_num(bot, ev)
+    if not search_limit.check(ev.user_id):
+        await bot.send(ev, '你今天点的歌太多辣，欢迎明早5点后再来！', at_sender=True)
+        return
     search_limit.increase(ev.user_id, 1)
 
     m = ev.message[0]
     if m.type == 'text':
         keyword = ev.message[0].data['text']
         if not keyword:
-            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 点歌+关键字: 点歌\n> 功能优化中……_(:3」」', at_sender=True)
+            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 点歌+关键字: 关键字点歌\n> 功能优化中……_(:3」」', at_sender=True)
             return
         try:
-            msg = music_keyword(keyword)
+            t = MusicThread(music_keyword, args=keyword)
+            t.start()
+            t.join()
+            msg = t.get_result()
             await bot.send(ev, msg, at_sender=True)
         except:
             await bot.send(ev, '由未知错误导致点歌失败QAQ', at_sender=True)
