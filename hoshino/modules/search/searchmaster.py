@@ -10,7 +10,7 @@ headers = {
 }
 session.headers = headers
 
-api_key = "4d0d0155cb6affe986cada4d79851189e039fe85"
+api_key = "755900855ee1ef2a628723"
 
 
 def getShareText(baseURL, titletype: str):
