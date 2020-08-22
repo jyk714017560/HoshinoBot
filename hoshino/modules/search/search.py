@@ -10,13 +10,14 @@ from hoshino.util import DailyNumberLimiter, FreqLimiter
 
 from .searchmaster import SearchMaster
 from .pixivmaster import *
+from .musicmaster import *
 
 try:
     import ujson as json
 except:
     import json
 
-sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=False, visible=False, manage_priv=priv.OWNER)
+sv = Service('search', help_='sv_help', bundle='pcr娱乐', enable_on_default=True, visible=True, manage_priv=priv.OWNER)
 search_limit = DailyNumberLimiter(25)
 lmt = FreqLimiter(10)
 
@@ -135,3 +136,27 @@ async def delete_msg(ev: CQEvent, ret):
         await hoshino.get_bot().delete_msg(self_id=ev.self_id, message_id=ret['message_id'])
     except:
         return
+
+
+@sv.on_prefix('点歌')
+async def search_music(bot, ev: CQEvent):
+    if not lmt.check(ev.user_id):
+        await bot.send(ev, f'乖，要懂得节制噢，点歌冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
+        return
+    lmt.start_cd(ev.user_id)
+
+    await check_search_num(bot, ev)
+    search_limit.increase(ev.user_id, 1)
+
+    m = ev.message[0]
+    if m.type == 'text':
+        keyword = ev.message[0].data['text']
+        if not keyword:
+            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 点歌+关键字: 点歌\n> 功能优化中……_(:3」」', at_sender=True)
+            return
+        try:
+            msg = music_keyword(keyword)
+            await bot.send(ev, msg, at_sender=True)
+        except:
+            await bot.send(ev, '由未知错误导致点歌失败QAQ', at_sender=True)
+
