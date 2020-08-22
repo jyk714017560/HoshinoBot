@@ -4,6 +4,13 @@ from hoshino.typing import CQEvent
 sv = Service('_help_', manage_priv=priv.SUPERUSER, visible=False)
 
 TOP_MANUAL = '''
+新增功能：
+[搜图]
+    [搜图+图片] 以图搜图
+    [搜图+关键字] 关键字搜图
+[小游戏]
+    [猜语音] 猜猜随机的语音来自哪位角色
+    [猜卡面] 猜猜截取的卡面来自哪位角色
 =====================
 - 七七群Bot使用说明 -
 =====================
@@ -11,6 +18,7 @@ TOP_MANUAL = '''
 ※功能采取模块化管理，群管理可控制开关
 
 [#来发十连] 转蛋模拟
+[会战面板] http://140.143.169.143/yobot/user/ 
 [会战帮助] http://140.143.169.143/yobot/help/ 
 [会战手册] http://140.143.169.143/yobot/manual/ 
 [lssv] 查看功能模块的开关状态（群管理限定）

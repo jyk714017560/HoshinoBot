@@ -24,7 +24,7 @@ async def chat_waifu(bot, ev):
         await bot.send(ev, R.img('laopo.jpg').cqcode)
     else:
         await bot.send(ev, 'mua~')
-        await bot.send(ev, R.record('mua.m4a').cqcode)
+        # await bot.send(ev, R.record('mua.m4a').cqcode)
 
 
 @sv.on_fullmatch('老公', only_to_me=True)
@@ -95,11 +95,13 @@ async def qks_keyword(bot, ev):
 
 @sv.on_keyword(('炼铜'))
 async def chat_liantong(bot, ev):
-    await bot.send(ev, R.record('hentai.wav').cqcode)
+    return
+    # await bot.send(ev, R.record('hentai.wav').cqcode)
 
 @sv.on_keyword(('pahu'))
 async def chat_pahu(bot, ev):
-    await bot.send(ev, R.record(f"pahu/{random.randint(1, 3)}.m4a").cqcode)
+    return
+    # await bot.send(ev, R.record(f"pahu/{random.randint(1, 3)}.m4a").cqcode)
 
 
 
