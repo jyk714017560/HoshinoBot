@@ -66,13 +66,9 @@ def dump_colle_config():
 
 
 gacha_10_aliases = ('抽十连', '十连', '十连！', '十连抽', '来个十连', '来发十连', '来次十连', '抽个十连', '抽发十连', '抽次十连', '十连扭蛋', '扭蛋十连',
-                    '10连', '10连！', '10连抽', '来个10连', '来发10连', '来次10连', '抽个10连', '抽发10连', '抽次10连', '10连扭蛋', '扭蛋10连',
-                    '十連', '十連！', '十連抽', '來個十連', '來發十連', '來次十連', '抽個十連', '抽發十連', '抽次十連', '十連轉蛋', '轉蛋十連',
-                    '10連', '10連！', '10連抽', '來個10連', '來發10連', '來次10連', '抽個10連', '抽發10連', '抽次10連', '10連轉蛋', '轉蛋10連')
-gacha_1_aliases = ('单抽', '单抽！', '来发单抽', '来个单抽', '来次单抽', '扭蛋单抽', '单抽扭蛋',
-                   '單抽', '單抽！', '來發單抽', '來個單抽', '來次單抽', '轉蛋單抽', '單抽轉蛋')
-gacha_300_aliases = ('抽一井', '来一井', '来发井', '抽发井', '天井扭蛋', '扭蛋天井', '天井轉蛋', '轉蛋天井')
-gacha_info_aliases = ('卡池资讯', '查看卡池', '看看卡池', '康康卡池', '卡池資訊', '看看up', '看看UP')
+                    '10连', '10连！', '10连抽', '来个10连', '来发10连', '来次10连', '抽个10连', '抽发10连', '抽次10连', '10连扭蛋', '扭蛋10连')
+gacha_1_aliases = ('单抽', '单抽！', '来发单抽', '来个单抽', '来次单抽', '扭蛋单抽', '单抽扭蛋')
+gacha_300_aliases = ('抽一井', '来一井', '来发井', '抽发井', '天井扭蛋', '扭蛋天井')
 
 
 @sv.on_prefix('建立仓库')
@@ -160,7 +156,7 @@ async def list_colle(bot, ev: CQEvent):
         await bot.send(ev,f'{name}君你还没有仓库，请使用\"建立仓库\"进行初始化')
 
     
-@sv.on_fullmatch(('卡池资讯', '查看卡池', '看看卡池', '康康卡池', '卡池資訊', '看看up', '看看UP'))
+@sv.on_fullmatch(('卡池资讯', '查看卡池', '看看卡池', '康康卡池', '看看up', '看看UP'))
 async def gacha_info(bot, ev: CQEvent):
     gid = str(ev.group_id)
     gacha = Gacha(_group_pool[gid])
@@ -276,9 +272,7 @@ async def gacha_1(bot, ev: CQEvent):
     if _colle_enable[uid]:
         await modify_colle(bot, ev, [chara])
             
-    res = f'{chara.name} {"★"*chara.star}'
-    if sv.bot.config.USE_CQPRO:
-        res = f'{chara.icon.cqcode} {res}'
+    res = f'{chara.icon.cqcode} {chara.name} {"★"*chara.star}'
     
     await bot.send(ev, f'素敵な仲間が増えますよ！\n{res}', at_sender=True)
 
@@ -297,21 +291,20 @@ async def gacha_10(bot, ev: CQEvent):
     if _colle_enable[uid]:
         await modify_colle(bot, ev, result)
 
-    if sv.bot.config.USE_CQPRO:
-        res1 = chara.gen_team_pic(result[:5], star_slot_verbose=False)
-        res2 = chara.gen_team_pic(result[5:], star_slot_verbose=False)
-        res = concat_pic([res1, res2])
-        res = pic2b64(res)
-        res = MessageSegment.image(res)
-        result = [f'{c.name}{"★"*c.star}' for c in result]
-        res1 = ' '.join(result[0:5])
-        res2 = ' '.join(result[5:])
-        res = f'{res}\n{res1}\n{res2}'
-    else:
-        result = [f'{c.name}{"★"*c.star}' for c in result]
-        res1 = ' '.join(result[0:5])
-        res2 = ' '.join(result[5:])
-        res = f'{res1}\n{res2}'
+    res1 = chara.gen_team_pic(result[:5], star_slot_verbose=False)
+    res2 = chara.gen_team_pic(result[5:], star_slot_verbose=False)
+    res = concat_pic([res1, res2])
+    res = pic2b64(res)
+    res = MessageSegment.image(res)
+    result = [f'{c.name}{"★"*c.star}' for c in result]
+    res1 = ' '.join(result[0:5])
+    res2 = ' '.join(result[5:])
+    res = f'{res}\n{res1}\n{res2}'
+    # 纯文字版
+    # result = [f'{c.name}{"★"*c.star}' for c in result]
+    # res1 = ' '.join(result[0:5])
+    # res2 = ' '.join(result[5:])
+    # res = f'{res1}\n{res2}'
 
     await bot.send(ev, f'素敵な仲間が増えますよ！\n{res}', at_sender=True)
 
@@ -395,4 +388,4 @@ async def kakin(bot, ev: CQEvent):
             count += 1
     if count:
         await bot.send(ev, f"已为{count}位用户充值完毕！谢谢惠顾～")
-
+        
