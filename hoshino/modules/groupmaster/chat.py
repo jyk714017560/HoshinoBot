@@ -13,7 +13,7 @@ async def say_hello(session):
 
 sv = Service('chat', visible=False)
 
-@sv.on_fullmatch(('沙雕机器人', '沙雕機器人'))
+@sv.on_fullmatch('沙雕机器人')
 async def say_sorry(bot, ev):
     await bot.send(ev, 'ごめんなさい！嘤嘤嘤(〒︿〒)')
 
@@ -24,7 +24,6 @@ async def chat_waifu(bot, ev):
         await bot.send(ev, R.img('laopo.jpg').cqcode)
     else:
         await bot.send(ev, 'mua~')
-        # await bot.send(ev, R.record('mua.m4a').cqcode)
 
 
 @sv.on_fullmatch('老公', only_to_me=True)
