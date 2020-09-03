@@ -18,8 +18,8 @@ except:
     import json
 
 sv = Service('search', help_='[搜图+图片] 以图搜图\n[搜图+关键字] 关键字搜图\n[点歌+关键字] 关键字点歌', bundle='pcr娱乐', enable_on_default=True, visible=True)
-search_limit = DailyNumberLimiter(25)
-lmt = FreqLimiter(10)
+search_limit = DailyNumberLimiter(15)
+lmt = FreqLimiter(15)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
 

@@ -5,7 +5,7 @@ from hoshino.util import FreqLimiter, DailyNumberLimiter
 from .setumaster import *
 
 sv = Service('setu', visible=False)
-_nlmt = DailyNumberLimiter(25)
+_nlmt = DailyNumberLimiter(15)
 _flmt = FreqLimiter(15)
 
 SETU_EXCEED_NOTICE = '你今天冲的太多辣，欢迎明早5点后再来！'

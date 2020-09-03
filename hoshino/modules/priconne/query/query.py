@@ -33,7 +33,7 @@ async def rank_sheet(bot, ev):
             msg.append(str(p6))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_tw:
-        msg.append('※搬运自漪夢奈特\nR17-3 rank表：\n')
+        msg.append('\n※搬运自漪夢奈特\nR17-3 rank表：')
         pos = match.group(3)
         if not pos:
             msg.append('使用 [台前/台中/台后]rank 查看详情')
