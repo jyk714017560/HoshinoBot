@@ -1,4 +1,5 @@
 import requests
+import threading
 from nonebot import MessageSegment
 
 try:
