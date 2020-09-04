@@ -170,7 +170,7 @@ async def gacha_info(bot, ev: CQEvent):
 
 
 POOL_NAME_TIP = '请选择以下卡池\n> 切换卡池jp\n> 切换卡池tw\n> 切换卡池cn\n> 切换卡池mix'
-@sv.on_prefix(('切换卡池', '选择卡池', '切換卡池', '選擇卡池'))
+@sv.on_prefix(('切换卡池', '选择卡池'))
 async def set_pool(bot, ev: CQEvent):
     if not priv.check_priv(ev, priv.ADMIN):
         await bot.finish(ev, '只有群管理才能切换卡池哦~', at_sender=True)
