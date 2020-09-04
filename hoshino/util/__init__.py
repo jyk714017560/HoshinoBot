@@ -75,7 +75,7 @@ def fig2b64(plt:plt) -> str:
 def concat_pic(pics, border=5):
     num = len(pics)
     w, h = pics[0].size
-    des = Image.new('RGBA', (w, num * h + (num-1) * border), (255, 255, 255, 255))
+    des = Image.new('RGBA', (w, num * h + (num-1) * border), (255, 255, 255, 0))
     for i, pic in enumerate(pics):
         des.paste(pic, (0, i * (h + border)), pic)
     return des
