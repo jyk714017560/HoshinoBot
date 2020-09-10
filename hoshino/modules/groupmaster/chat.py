@@ -102,5 +102,10 @@ async def chat_pahu(bot, ev):
     return
     # await bot.send(ev, R.record(f"pahu/{random.randint(1, 3)}.m4a").cqcode)
 
+@sv.on_prefix('echo')
+async def echo(bot, ev):
+    msg = ev.message.extract_plain_text().strip()
+    await bot.send(ev, msg)
+
 
 
