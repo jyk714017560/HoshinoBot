@@ -3,6 +3,7 @@ from hoshino import Service, priv
 from hoshino.util import FreqLimiter, DailyNumberLimiter
 
 from .setumaster import *
+from .identifymaster import setu_distinguish
 
 sv = Service('setu', visible=False)
 _nlmt = DailyNumberLimiter(15)
@@ -35,3 +36,30 @@ async def reset_setu(bot, ev: CQEvent):
         return
     msg = setu_reset()
     await bot.send(ev, msg)
+
+
+@sv.on_prefix('test')
+async def setu_identify(bot, ev: CQEvent):
+
+    if not priv.check_priv(ev, priv.ADMIN):
+        return
+    m = ev.message[0]
+    if m.type == 'image':
+        img_url = m.data['url']
+        confidence = setu_distinguish(img_url)
+        msg = []
+        msg.append(f'色图指数：{confidence}%')
+        if confidence < 20:
+            msg.append('就这，不够色')
+        elif confidence < 50:
+            msg.append('一般，多来点')
+        elif confidence < 90:
+            msg.append('警察叔叔就是这个人o(╥﹏╥)o')
+        else:
+            msg.append('群要没了o(╥﹏╥)o')
+        await bot.send(ev, '\n'.join(msg))
+            
+
+
+            
+
