@@ -84,7 +84,7 @@ async def setu_discern_master(bot, ev: CQEvent):
     #测试用
     if not priv.check_priv(ev, priv.ADMIN):
         return
-    await setu_discern(bot, ev)
+    await setu_discern(bot, ev )
 
 
 
