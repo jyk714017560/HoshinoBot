@@ -3,6 +3,10 @@ from hoshino import Service, priv
 from hoshino.util import FreqLimiter, DailyNumberLimiter
 
 from .setumaster import *
+from .discernmaster import setu_distinguish
+
+import random
+from datetime import datetime
 
 sv = Service('setu', visible=False)
 _nlmt = DailyNumberLimiter(15)
@@ -35,3 +39,58 @@ async def reset_setu(bot, ev: CQEvent):
         return
     msg = setu_reset()
     await bot.send(ev, msg)
+
+
+async def setu_discern(bot, ev):
+
+    m = ev.message[0]
+    if m.type == 'image':
+        img_url = m.data['url']
+        confidence = await setu_distinguish(img_url)
+        msg = []
+        msg.append(f'色图指数：{confidence}%')
+        if not confidence:
+            if random.random() < 0.02:
+                await bot.send(ev, '诶嘿~')
+            return
+        elif confidence < 30:
+            if random.random() < 0.05:
+                await bot.send(ev, '哦呐嘎憋锅憋锅~')
+            return
+        elif confidence < 50:
+            if random.random() < 0.10:
+                msg.append('就这，不够色!')
+            elif random.random() < 0.20:
+                msg.append('一般，多来点！')
+        elif confidence < 90:
+            msg.append('警察叔叔就是这个人o(╥﹏╥)o')
+        else:
+            msg.append('群要没了o(╥﹏╥)o')
+        await bot.send(ev, '\n'.join(msg))
+
+
+@sv.on_message()
+async def setu_discern_group(bot, ev: CQEvent):
+    #仅开放七曜群和塞姆利亚群
+    if ev.group_id == 1058019377 or ev.group_id == 602138153:
+        now = datetime.now()
+        if 21 <= now.hour <= 23:
+            if len(ev.message) == 1:
+                await setu_discern(bot, ev)
+
+
+@sv.on_prefix('识图')
+async def setu_discern_master(bot, ev: CQEvent):
+    #测试用
+    if not priv.check_priv(ev, priv.ADMIN):
+        return
+    await setu_discern(bot, ev)
+
+
+
+
+            
+
+
+            
+
