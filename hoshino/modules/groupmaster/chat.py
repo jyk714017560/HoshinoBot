@@ -94,8 +94,7 @@ async def qks_keyword(bot, ev):
 
 @sv.on_keyword(('炼铜'))
 async def chat_liantong(bot, ev):
-    return
-    # await bot.send(ev, R.record('hentai.wav').cqcode)
+    await bot.send(ev, R.record('hentai.silk').cqcode)
 
 @sv.on_keyword(('pahu'))
 async def chat_pahu(bot, ev):

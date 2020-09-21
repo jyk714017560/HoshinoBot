@@ -326,8 +326,8 @@ class Service:
                     self.logger.info(f'Scheduled job {func.__name__} completed.')
                     return ret
                 except Exception as e:
-                    self.logger.error(f'{type(e)} occured when doing scheduled job {func.__name__}.')
-                    self.logger.exception(e)
+                    self.logger.info(f'{type(e)} occured when doing scheduled job {func.__name__}.')
+                    # self.logger.exception(e)
             return nonebot.scheduler.scheduled_job(*args, **kwargs)(wrapper)
         return deco
 

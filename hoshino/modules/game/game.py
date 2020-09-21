@@ -23,7 +23,7 @@ _group_winner = {}
 _group_winner = defaultdict(lambda: [], _group_winner)
 _group_parameter = {}
 
-voicepath = os.path.join(hoshino.config.RES_DIR, 'record/title')
+voicepath = os.path.join(hoshino.config.RES_DIR, 'record/title_silk')
 cardpath = os.path.join(hoshino.config.RES_DIR, 'img/priconne/card/')
 
 GAME_NAME_TIP = '请选择以下小游戏\n> 猜语音\n> 猜卡面\n> 棒球（开发中）\n> 赛马（开发中）'
@@ -39,9 +39,6 @@ async def game_start(bot, ev: CQEvent):
 
 @sv.on_fullmatch(('猜语音'))
 async def voiceguess(bot, ev: CQEvent):
-
-    await bot.send(ev, '语音维护中,暂不开放 (•̀へ•╮)')
-    return
 
     if ev['message_type'] != 'group':
         await bot.send(ev, '小游戏仅支持群组游玩，好孩子要学会和伙伴一起玩哦~')
@@ -59,7 +56,7 @@ async def voiceguess(bot, ev: CQEvent):
         _group_parameter[gid] = voice_id
 
         await bot.send(ev, f'猜猜这个语音来自哪位角色? ({ONE_TURN_TIME}s后公布答案)')
-        await bot.send(ev, R.record(f"title/{voice}").cqcode)
+        await bot.send(ev, R.record(f"title_silk/{voice}").cqcode)
         await asyncio.sleep(ONE_TURN_TIME)
         msg = [f'锵锵，正确答案是: \n{c.icon.cqcode}{c.name}']
         if not _group_winner[gid]:

@@ -6,7 +6,7 @@ sv = Service('_help_', manage_priv=priv.SUPERUSER, visible=False)
 TOP_MANUAL = '''
 新增功能：
 [点歌+关键字] 关键字点歌
-[猜语音] 维护中,暂不开放
+[猜语音] 功能重新开放
 =====================
 - 七七群Bot使用说明 -
 =====================

@@ -34,15 +34,15 @@ def music_keyword(keyword):
     keywordJson = keywordResult.json()
     if keywordJson['result']['songCount']:
         id = keywordJson['result']['songs'][0]['id']
-        title = keywordJson['result']['songs'][0]['name']
-        artist = keywordJson['result']['songs'][0]['artists'][0]['name']
-        image = keywordJson['result']['songs'][0]['album']['blurPicUrl']
-        imageUrl = f'{image}?param=90y90'
-        audioUrl = f'http://music.163.com/song/media/outer/url?id={id}.mp3'
+        # title = keywordJson['result']['songs'][0]['name']
+        # artist = keywordJson['result']['songs'][0]['artists'][0]['name']
+        # image = keywordJson['result']['songs'][0]['album']['blurPicUrl']
+        # imageUrl = f'{image}?param=90y90'
+        # audioUrl = f'http://music.163.com/song/media/outer/url?id={id}.mp3'
     else:
         return '没有版权，发不出去勒...'
   
-    return MessageSegment.music_custom(url='https://bh3.mihoyo.com/', audio_url=audioUrl, title=title, content=artist, image_url=imageUrl)
+    return MessageSegment.music(type_='163', id_=id)
 
 
 class MusicThread(threading.Thread):
