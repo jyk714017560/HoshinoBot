@@ -12,7 +12,7 @@ import base64
 APPKEY = '0U4fBhJ0EJSi2YOw'
 session = requests.session()
 CONTROL_GROUP = 700
-EMOJI_CRITERION = 100
+EMOJI_CRITERION = 70
 
 async def setu_distinguish(img_url):
     img = await pic2b64(img_url)
@@ -31,7 +31,9 @@ async def setu_distinguish(img_url):
     r = session.post(url=url, data=params)
     j = r.json()
     if not j['ret']:
-        confidence = j['data']['tag_list'][1]['tag_confidence']
+        hotconf = j['data']['tag_list'][1]['tag_confidence']
+        pornconf = j['data']['tag_list'][2]['tag_confidence']
+        confidence = hotconf if hotconf > pornconf else pornconf
         return confidence
     else:
         return 0

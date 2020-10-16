@@ -81,8 +81,11 @@ async def search_pic(bot, ev: CQEvent):
     if ascii2d_disable:
         return
     color, bovw = sm.ascii2d()
-    await bot.send(ev, color)
-    await bot.send(ev, bovw)
+    color_ret = await bot.send(ev, color)
+    bovw_ret = await bot.send(ev, bovw)
+    await asyncio.sleep(60)
+    await delete_msg(ev, color_ret)
+    await delete_msg(ev, bovw_ret)
 
 
 @sv.on_prefix('搜图')
@@ -163,4 +166,30 @@ async def search_music(bot, ev: CQEvent):
             await bot.send(ev, msg, at_sender=True)
         except:
             await bot.send(ev, '由未知错误导致点歌失败QAQ', at_sender=True)
+
+
+@sv.on_rex(r'^来[份点张](.{1,20})[涩色瑟]图$')
+async def search_pic_keyword(bot, ev: CQEvent):
+    
+    if ev.group_id == 1058019377 or ev.group_id == 602138153:      
+        if not lmt.check(ev.user_id):
+            await bot.send(ev, f'乖，要懂得节制噢，搜图冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
+            return
+        lmt.start_cd(ev.user_id)
+
+        await check_search_num(bot, ev)
+        search_limit.increase(ev.user_id, 1)
+
+        keyword = ev['match'].group(1)
+        if not keyword:
+            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 搜图+图片: 以图搜图\n> 搜图+关键字: 关键字搜图\n> 功能优化中……_(:3」」', at_sender=True)
+            return
+        try:
+            t = PixivicThread(pixivic_keyword, args=keyword)
+            t.start()
+            t.join()
+            msg = t.get_result()
+            await bot.send(ev, msg, at_sender=True)
+        except:
+            await bot.send(ev, '由未知错误导致搜图失败QAQ', at_sender=True)
 

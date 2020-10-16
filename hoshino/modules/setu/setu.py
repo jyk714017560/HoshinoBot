@@ -66,17 +66,15 @@ async def setu_discern(bot, ev):
             msg.append('警察叔叔就是这个人o(╥﹏╥)o')
         else:
             msg.append('群要没了o(╥﹏╥)o')
-        await bot.send(ev, '\n'.join(msg))
+        await bot.send(ev, '\n'.join(msg))        
 
 
 @sv.on_message()
 async def setu_discern_group(bot, ev: CQEvent):
     #仅开放七曜群和塞姆利亚群
     if ev.group_id == 1058019377 or ev.group_id == 602138153:
-        now = datetime.now()
-        if 21 <= now.hour <= 23:
-            if len(ev.message) == 1:
-                await setu_discern(bot, ev)
+        if len(ev.message) == 1:
+            await setu_discern(bot, ev)
 
 
 @sv.on_prefix('识图')
@@ -85,12 +83,3 @@ async def setu_discern_master(bot, ev: CQEvent):
     if not priv.check_priv(ev, priv.ADMIN):
         return
     await setu_discern(bot, ev )
-
-
-
-
-            
-
-
-            
-
