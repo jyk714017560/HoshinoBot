@@ -11,6 +11,7 @@ from hoshino.util import DailyNumberLimiter, FreqLimiter
 from .searchmaster import SearchMaster
 from .pixivmaster import *
 from .musicmaster import *
+from . import _music_data
 
 try:
     import ujson as json
@@ -166,6 +167,28 @@ async def search_music(bot, ev: CQEvent):
             await bot.send(ev, msg, at_sender=True)
         except:
             await bot.send(ev, '由未知错误导致点歌失败QAQ', at_sender=True)
+
+
+def music_gener():
+    musiclist = _music_data.MUSIC_DATA
+    for musicId, musicInfo in musiclist.items():
+            yield musicId, musicInfo
+
+music_gener = music_gener()
+
+@sv.on_notice('notify.poke')
+async def daily_music(session: NoticeSession):
+    if session.ctx['target_id'] != session.event['self_id']:
+        return
+    if session.event['group_id'] == 1058019377 or session.event['group_id']  == 602138153:
+        if not priv.check_priv(session.event, priv.SUPERUSER):
+            await session.send('测试功能，仅限主人使用哦', at_sender=True)
+            return
+        musicId, musicInfo = music_gener.__next__()
+        info = '今日份的午间音乐广播~' + musicInfo[1] + '\n' + '[这里应该有一张图片待我想想怎么加]' + '\n' + '歌曲名: ' + musicInfo[2] + '\n' + '歌手: ' + musicInfo[3]
+        music = MessageSegment.music(type_=musicInfo[0], id_=musicId)
+        await session.send(info)
+        await session.send(music)
 
 
 @sv.on_rex(r'^来[份点张](.{1,20})[涩色瑟]图$')
