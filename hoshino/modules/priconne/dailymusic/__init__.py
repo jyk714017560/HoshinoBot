@@ -1,7 +1,7 @@
 import random
 
 import hoshino
-from hoshino import R
+from hoshino import Service,R
 from hoshino.typing import *
 
 from . import _music_data
@@ -19,12 +19,12 @@ def music_gener():
 
 music_gener = music_gener()
 
-@sv.scheduled_job('cron', hour=6, minute=9)
+@sv.scheduled_job('cron', hour=18, minute=1)
 async def daily_music():
     bot = hoshino.get_bot()
     musicId, musicInfo = music_gener.__next__()
     msg = [
-        "美食殿今日的晚间音乐~ test",
+        "美食殿今日的晚间音乐~",
         f"{musicInfo[1]}",
         f"{R.img('priconne/dailymusic/', musicInfo[4]).cqcode}",
         f"歌曲名: {musicInfo[2]}",
