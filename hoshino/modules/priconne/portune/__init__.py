@@ -22,7 +22,7 @@ sv_help = '''
 sv = Service('portune', help_=sv_help, bundle='pcr娱乐', enable_on_default=True, visible=False)
 lmt = DailyNumberLimiter(1)
 
-Img_Path = 'priconne\portunedata'
+Img_Path = 'priconne/portunedata'
 PORTUNE_EXCEED_NOTICE = '你今天已经抽过签了，欢迎明早5点后再来！'
 
 
