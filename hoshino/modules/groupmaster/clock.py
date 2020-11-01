@@ -9,7 +9,7 @@ from hoshino.typing import *
 from hoshino.util import pic2b64, DailyNumberLimiter
 
 sv = Service('clock', visible=False)
-fontPath = fontPath = os.path.join(os.path.dirname(__file__), 'SF-Pro-Display-Bold.otf')
+fontPath = R.img('font/SF-Pro-Display-Bold.otf').path
 clock_limit = DailyNumberLimiter(1)
 
 @sv.on_keyword(('晚安'))

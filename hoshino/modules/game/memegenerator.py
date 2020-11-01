@@ -6,10 +6,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 import hoshino
 from hoshino.typing import *
-from hoshino import Service
+from hoshino import Service, R
 from hoshino.util import pic2b64, FreqLimiter, DailyNumberLimiter
 
 sv = Service('memegenerator', help_='', bundle='pcr娱乐', enable_on_default=True, visible=False)
+fontPath = R.img('font/msyhbd.ttf').path
 _nlmt = DailyNumberLimiter(15)
 _flmt = FreqLimiter(15)
 session = requests.session()
@@ -60,7 +61,6 @@ async def meme(bot, ev: CQEvent):
     img_new = Image.new("RGB", (w, h + max(int(h / 5), 30)), "white")
     img_new.paste(img, (0, 0))
 
-    fontPath = os.path.join(os.path.dirname(__file__), 'msyhbd.ttf')
     imgFont = ImageFont.truetype(font=fontPath, size=max(int(h / 10), 15))
     textSize = imgFont.getsize(text=keyword)
     xy = ((w - textSize[0]) / 2, h + (max(int(h / 5), 30) - textSize[1]) / 2)
