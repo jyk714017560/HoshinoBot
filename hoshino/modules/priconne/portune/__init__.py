@@ -19,7 +19,7 @@ sv_help = '''
 准确率高达114.514%！
 '''.strip()
 #帮助文本
-sv = Service('portune', help_=sv_help, bundle='pcr娱乐', enable_on_default=True, visible=False)
+sv = Service('portune', help_=sv_help, bundle='pcr娱乐', enable_on_default=True, visible=True)
 lmt = DailyNumberLimiter(1)
 
 Img_Path = 'priconne/portunedata'

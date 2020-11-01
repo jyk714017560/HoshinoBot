@@ -18,25 +18,21 @@ session = requests.session()
 CONTROL_GROUP = 700
 MEME_EXCEED_NOTICE = '佩可今天不想为你生成表情包啦，欢迎明早5点后再来！'
 
-@sv.on_keyword('表情包')
+@sv.on_prefix('生成表情')
 async def meme(bot, ev: CQEvent):
-    if ev.message[0].type != 'image':
+    if ev.message[0].type != 'text':
+        await bot.send(ev, '必须要发送关键字才能生成表情噢\n> 生成表情+关键字+图片: 生成表情', at_sender=True)
         return
-    img_url = ev.message[0].data['url']
+    keyword = ev.message[0].data['text']
+    keyword=keyword.rstrip()
 
-    #正则表达式提取关键字
-    if ev.message[1].type != 'text':
+    if len(ev.message) < 2 or ev.message[1].type != 'image':
+        await bot.send(ev, '必须要发送图片才能生成表情噢\n> 生成表情+关键字+图片: 生成表情', at_sender=True)
         return
-    rex = re.compile(r'\s*表情包(\s*)(.{1,20})')
-    text = ev.message[1].data['text']
-    match = rex.match(text)
-    if not match:
-        await bot.send(ev, '必须要发送关键字才能生成表情包噢\n> 图片+表情包+关键字: 以图搜图', at_sender=True)
-        return
-    keyword = match.group(2)
+    img_url = ev.message[1].data['url']
 
     if not _flmt.check(ev.user_id):
-        await bot.send(ev, f'乖，要懂得节制噢，表情包生成冷却中（剩余 {int(_flmt.left_time(ev.user_id)) + 1}秒）', at_sender=True)
+        await bot.send(ev, f'乖，要懂得节制噢，生成表情冷却中（剩余 {int(_flmt.left_time(ev.user_id)) + 1}秒）', at_sender=True)
         return
     if not _nlmt.check(ev.user_id):
         await bot.send(ev, MEME_EXCEED_NOTICE, at_sender=True)
