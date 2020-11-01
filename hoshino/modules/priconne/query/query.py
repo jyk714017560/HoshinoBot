@@ -7,10 +7,10 @@ p0 = R.img('priconne/quick/r17-3-tw-0.png').cqcode
 p1 = R.img('priconne/quick/r17-3-tw-1.png').cqcode
 p2 = R.img('priconne/quick/r17-3-tw-2.png').cqcode
 p3 = R.img('priconne/quick/r17-3-tw-3.png').cqcode
-p4 = R.img('priconne/quick/r18-3-1.png').cqcode
-p5 = R.img('priconne/quick/r18-3-2.png').cqcode
-p6 = R.img('priconne/quick/r18-3-3.png').cqcode
-p7 = R.img('priconne/quick/r10-3.png').cqcode
+p4 = R.img('priconne/quick/r18-5-1.png').cqcode
+p5 = R.img('priconne/quick/r18-5-2.png').cqcode
+p6 = R.img('priconne/quick/r18-5-3.png').cqcode
+p7 = R.img('priconne/quick/r10-5-cn.png').cqcode
 
 @sv.on_rex(r'^(\*?([日台国陆b])服?([前中后]*)卫?)?rank(表|推荐|指南)?$')
 async def rank_sheet(bot, ev):
@@ -23,7 +23,7 @@ async def rank_sheet(bot, ev):
         return
     msg = []
     if is_jp:
-        msg.append('R18 不穿衣服 rank表：')
+        msg.append('R18-5 rank表：')
         pos = match.group(3)
         if not pos or '前' in pos:
             msg.append(str(p4))
@@ -46,7 +46,7 @@ async def rank_sheet(bot, ev):
             msg.append(str(p3))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_cn:
-        msg.append('R10-3 rank表：')
+        msg.append('R10-5 rank表：')
         msg.append(str(p7))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
         # await bot.send(ev, str(p7))
