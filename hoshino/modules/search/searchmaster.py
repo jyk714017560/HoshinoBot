@@ -108,8 +108,8 @@ class SearchMaster(object):
                     illust_id = results['results'][0]['data']['nijie_id']
                     thumbnail = results['results'][0]['header']['thumbnail']
                     ext_url = results['results'][0]['data']['ext_urls'][0]
-                elif index_id == 12:
-                    #12->danbooru
+                elif index_id == 9 or index_id == 12:
+                    #9/12->danbooru
                     service_name = 'danbooru'
                     illust_id = results['results'][0]['data']['source']
                     member_name = results['results'][0]['data']['creator']
@@ -123,15 +123,34 @@ class SearchMaster(object):
                 elif index_id == 21:
                      #21->Anime
                     service_name = 'Anime'
-                    illust_id = results['results'][0]['data']['source']
+                    title = results['results'][0]['data']['source']
                     thumbnail = results['results'][0]['header']['thumbnail']
-                    ext_url = results['results'][0]['data']['ext_urls'][0]                       
+                    ext_url = results['results'][0]['data']['ext_urls'][0]
+                elif index_id == 22:
+                     #22->H-Anime
+                    service_name = 'H-Anime'
+                    title = results['results'][0]['data']['source']
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]                                             
                 elif index_id == 34:
                     #34->da
                     service_name = 'da'
                     illust_id = results['results'][0]['data']['da_id']
                     thumbnail = results['results'][0]['header']['thumbnail']
                     ext_url = results['results'][0]['data']['ext_urls'][0]
+                elif index_id == 37:
+                    #37->MangaDex
+                    service_name = 'MangaDex'
+                    title = results['results'][0]['data']['source']    
+                    member_name = results['results'][0]['data']['artist']
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]                    
+                elif index_id == 38:
+                    #38->E-Hentai
+                    service_name = 'E-Hentai'
+                    title = results['results'][0]['data']['source']    
+                    member_name = results['results'][0]['data']['creator'][0]
+                    thumbnail = results['results'][0]['header']['thumbnail']
                 else:
                     #unknown
                     return '很抱歉，该功能还在摸鱼制作中_(:3」」', False
@@ -143,7 +162,7 @@ class SearchMaster(object):
                     f"{ext_url}",
                     f"Author: https://pixiv.net/u/{member_id}"
                     ]
-                elif index_id == 12:
+                elif index_id == 9 or index_id == 12:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"画师: {member_name}",
                     f"[CQ:image,file={thumbnail}]",
@@ -154,7 +173,24 @@ class SearchMaster(object):
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"[CQ:image,file={thumbnail}]",
                     f"{member_name}",
-                    ]            
+                    ]
+                elif index_id == 21 or index_id == 22:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"「{title}」",
+                    f"[CQ:image,file={thumbnail}]",
+                    f"{ext_url}",
+                    ]                   
+                elif index_id == 37:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"「{title}」/「{member_name}」",
+                    f"[CQ:image,file={thumbnail}]",
+                    f"{ext_url}",
+                    ]                       
+                elif index_id == 38:
+                    msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
+                    f"「{title}」/「{member_name}」",
+                    f"[CQ:image,file={thumbnail}]",
+                    ]                                
                 else:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"[CQ:image,file={thumbnail}]",
