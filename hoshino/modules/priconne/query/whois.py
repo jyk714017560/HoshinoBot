@@ -64,3 +64,16 @@ async def fullcard(bot, ev: CQEvent):
     if confi > 60:
         msg += f'{c.card.cqcode}'
         await bot.send(ev, msg)
+
+@sv.on_message()
+async def fullcard_ex(bot, ev: CQEvent):
+    name = ev.message.extract_plain_text().strip()
+    if not name:
+        return
+    id_ = chara.name2id(name)
+    if id_ == chara.UNKNOWN:
+        return
+    c = chara.fromid(id_)
+
+    msg = f'{c.card.cqcode}'
+    await bot.send(ev, msg)

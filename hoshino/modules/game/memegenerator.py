@@ -18,7 +18,7 @@ session = requests.session()
 CONTROL_GROUP = 700
 MEME_EXCEED_NOTICE = '佩可今天不想为你生成表情包啦，欢迎明早5点后再来！'
 
-@sv.on_prefix('生成表情')
+@sv.on_prefix(('生成表情', '制作表情', '表情制作'))
 async def meme(bot, ev: CQEvent):
     if ev.message[0].type != 'text':
         await bot.send(ev, '必须要发送关键字才能生成表情噢\n> 生成表情+关键字+图片: 生成表情', at_sender=True)
