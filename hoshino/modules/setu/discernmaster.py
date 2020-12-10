@@ -12,7 +12,6 @@ import base64
 APPKEY = '0U4fBhJ0EJSi2YOw'
 session = requests.session()
 CONTROL_GROUP = 700
-EMOJI_CRITERION = 70
 
 async def setu_distinguish(img_url):
     img = await pic2b64(img_url)
@@ -48,12 +47,7 @@ async def getReqSign(params):
 
 async def pic2b64(img_url):
     r = session.get(url=img_url, timeout=20)
-    size = len(r.content) / 1024
     pic = Image.open(BytesIO(r.content))
-    if size < EMOJI_CRITERION:
-        return 0  
-    if pic.format == 'GIF':
-        return 0
     buf = BytesIO()
     pic.save(buf, format='PNG')
     size = len(buf.getvalue()) / 1024

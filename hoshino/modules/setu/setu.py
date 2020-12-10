@@ -41,22 +41,15 @@ async def reset_setu(bot, ev: CQEvent):
     await bot.send(ev, msg)
 
 
-async def setu_discern(bot, ev):
-
-    m = ev.message[0]
-    if m.type == 'image':
-        img_url = m.data['url']
+EMOJI_CRITERION = 70
+async def setu_discern(bot, ev, img_url):
         confidence = await setu_distinguish(img_url)
         msg = []
         msg.append(f'色图指数：{confidence}%')
         if not confidence:
-            if random.random() < 0.02:
-                await bot.send(ev, '诶嘿~')
             return
         elif confidence < 30:
-            if random.random() < 0.05:
-                await bot.send(ev, '哦呐嘎憋锅憋锅~')
-            return
+            pass
         elif confidence < 50:
             if random.random() < 0.10:
                 msg.append('就这，不够色!')
@@ -68,13 +61,24 @@ async def setu_discern(bot, ev):
             msg.append('群要没了o(╥﹏╥)o')
         await bot.send(ev, '\n'.join(msg))        
 
-
+EMOJI_CRITERION = 70
 @sv.on_message()
 async def setu_discern_group(bot, ev: CQEvent):
     #仅开放七曜群和塞姆利亚群
     if ev.group_id == 1058019377 or ev.group_id == 602138153:
         if len(ev.message) == 1:
-            await setu_discern(bot, ev)
+            m = ev.message[0]
+            if m.type == 'image':
+                img = m.data['file']
+                pic = await bot.get_image(file=img)
+                if pic['filename'].endswith('gif') or pic['size'] / 1024 < EMOJI_CRITERION:
+                    if random.random() < 0.02:
+                        await bot.send(ev, '诶嘿~')
+                    elif random.random() < 0.05:
+                        await bot.send(ev, '哦呐嘎憋锅憋锅~')
+                    return
+                img_url = m.data['url']
+                await setu_discern(bot, ev, img_url)
 
 
 @sv.on_prefix('识图')
@@ -82,4 +86,7 @@ async def setu_discern_master(bot, ev: CQEvent):
     #测试用
     if not priv.check_priv(ev, priv.ADMIN):
         return
-    await setu_discern(bot, ev )
+    m = ev.message[0]
+    if m.type == 'image':
+        img_url = m.data['url']   
+        await setu_discern(bot, ev, img_url)
