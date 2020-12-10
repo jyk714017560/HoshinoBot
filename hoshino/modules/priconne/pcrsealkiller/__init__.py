@@ -74,6 +74,16 @@ async def pcrsealkiller(bot, ev: CQEvent):
             if not isGacha:
                 return
             
+            #抽卡次数判定
+            verdictString = re.search('[0-9]+.\+[0-9]+', resultString)
+            if not verdictString:
+                return
+            gachaAmount = int(re.match('[0-9]+', verdictString.group(0)).group(0))
+            gid = str(ev.group_id)
+            gachaThershold = _gacha_thershold[gid]
+            if gachaAmount > gachaThershold:
+                return            
+            
             #抽卡new判定
             isNewGacha = False
             for r in result['texts']:
@@ -85,18 +95,11 @@ async def pcrsealkiller(bot, ev: CQEvent):
                     isNewGacha = True
                     break
             if not isNewGacha:
+                await bot.send(ev, f"注意！疑似海豹出没中_(:3」」")
                 return
             
-            #抽卡次数判定
-            verdictString = re.search('[0-9]+.\+[0-9]+', resultString)
-            if not verdictString:
-                return
-            gachaAmount = int(re.match('[0-9]+', verdictString.group(0)).group(0))
-            gid = str(ev.group_id)
-            gachaThershold = _gacha_thershold[gid]
-            if gachaAmount < gachaThershold:
-                await bot.send(ev, f"检测到海豹行为(╯‵□′)╯︵┻━┻\n{R.img('sealkiller.png').cqcode}")
-                await util.silence(ev, 60)
-                await asyncio.sleep(gachaAmount)
-                await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
-                return
+            #海豹审判
+            await bot.send(ev, f"检测到海豹行为(╯‵□′)╯︵┻━┻\n{R.img('sealkiller.png').cqcode}")
+            await util.silence(ev, 60)
+            await asyncio.sleep(gachaAmount)
+            await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
