@@ -20,7 +20,7 @@ sv = Service('pcrsealkiller', help_=sv_help, bundle='pcr娱乐', enable_on_defau
 
 GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交換Pt', '所持キャラ交換Pt', '持有的角色交换Pt', '所持キャラ交换Pt', '所持CSPキャラ交換Pt']
 DEFAULT_GACHA_THRESHOLD = 100  # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
-EMOJI_CRITERION = 50  #表情包判定标准
+EMOJI_CRITERION = 70  #表情包判定标准
 
 _gacha_thershold_file = os.path.expanduser('~/.hoshino/gacha_thershold_config.json')
 _gacha_thershold = {}
@@ -52,7 +52,8 @@ async def set_gacha_threshold(bot, ev: CQEvent):
 
 @sv.on_message()
 async def pcrsealkiller(bot, ev: CQEvent):
-    for m in ev.message:
+    if len(ev.message) == 1:
+        m = ev.message[0]
         if m.type == 'image':
             img = m.data['file']
             pic = await bot.get_image(file=img)
@@ -100,6 +101,7 @@ async def pcrsealkiller(bot, ev: CQEvent):
             
             #海豹审判
             await bot.send(ev, f"检测到海豹行为(╯‵□′)╯︵┻━┻\n{R.img('sealkiller.png').cqcode}")
-            await util.silence(ev, 60)
-            await asyncio.sleep(gachaAmount)
+            await util.silence(ev, 6 * gachaAmount)
+            await asyncio.sleep(gachaAmount)         
             await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+            return

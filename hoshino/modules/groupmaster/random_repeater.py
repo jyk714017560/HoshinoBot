@@ -32,7 +32,7 @@ async def random_repeater(bot, ev: CQEvent):
             if random.random() < p:    # 概率测试通过，复读并设flag
                 try:
                     group_stat[group_id] = (msg, True, 0)
-                    await bot.send(ev, util.filt_message(ev.message))
+                    await bot.send(ev, util.filt_message(msg))
                 except CQHttpError as e:
                     hoshino.logger.error(f'复读失败: {type(e)}')
                     hoshino.logger.exception(e)

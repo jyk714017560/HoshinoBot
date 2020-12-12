@@ -49,7 +49,8 @@ async def setu_discern(bot, ev, img_url):
         if not confidence:
             return
         elif confidence < 30:
-            pass
+            if random.random() < 0.9:
+                return
         elif confidence < 50:
             if random.random() < 0.10:
                 msg.append('就这，不够色!')
