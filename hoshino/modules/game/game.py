@@ -10,12 +10,13 @@ import hoshino
 from hoshino.typing import *
 from hoshino import Service, R, logger
 from hoshino.modules.priconne import chara
-from hoshino.util import pic2b64
+from hoshino.util import pic2b64, FreqLimiter
 
 sv = Service('game', help_='[猜语音] 猜猜随机的语音来自哪位角色\n[猜卡面] 猜猜截取的卡面来自哪位角色', bundle='pcr娱乐', enable_on_default=True, visible=True)
 
 GAME_POOL = ('voiceguess', 'cardguess', 'baseball', 'racing')
 ONE_TURN_TIME = 30
+glmt = FreqLimiter(ONE_TURN_TIME)
 
 _group_game = {}
 _group_game = defaultdict(lambda: '', _group_game)
@@ -57,6 +58,7 @@ async def voiceguess(bot, ev: CQEvent):
 
         await bot.send(ev, f'猜猜这个语音来自哪位角色? ({ONE_TURN_TIME}s后公布答案)')
         await bot.send(ev, R.record(f"title_silk/{voice}").cqcode)
+        glmt.start_cd(gid)
         await asyncio.sleep(ONE_TURN_TIME)
         msg = [f'锵锵，正确答案是: \n{c.icon.cqcode}{c.name}']
         if not _group_winner[gid]:
@@ -102,6 +104,7 @@ async def cardguess(bot, ev: CQEvent):
         res = MessageSegment.image(res)
 
         await bot.send(ev, f'猜猜这张卡面来自哪位角色? ({ONE_TURN_TIME}s后公布答案)\n{res}')
+        glmt.start_cd(gid)
         await asyncio.sleep(ONE_TURN_TIME)
         imgcard = R.img(f'priconne/card/{card}').cqcode
         msg = [f'锵锵，正确答案是: \n{imgcard}{c.name}']
