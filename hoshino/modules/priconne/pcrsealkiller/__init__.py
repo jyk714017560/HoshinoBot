@@ -8,6 +8,12 @@ import hoshino
 from hoshino import R, Service, util, priv
 from hoshino.typing import *
 
+from tencentcloud.common import credential
+from tencentcloud.common.profile.client_profile import ClientProfile
+from tencentcloud.common.profile.http_profile import HttpProfile
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
+from tencentcloud.ocr.v20181119 import ocr_client, models
+
 try:
     import ujson as json
 except:
@@ -21,6 +27,11 @@ sv = Service('pcrsealkiller', help_=sv_help, bundle='pcr娱乐', enable_on_defau
 GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交換Pt', '所持キャラ交換Pt', '持有的角色交换Pt', '所持キャラ交换Pt', '所持CSPキャラ交換Pt']
 DEFAULT_GACHA_THRESHOLD = 100  # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
 EMOJI_CRITERION = 70  #表情包判定标准
+BIG_CRITERION = 5000  #表情包判定标准
+
+SecretId = ''
+SecretKey = ''
+Region = ''
 
 _gacha_thershold_file = os.path.expanduser('~/.hoshino/gacha_thershold_config.json')
 _gacha_thershold = {}
@@ -42,12 +53,16 @@ GACHA_THRESHOLD_TIP = '请输入1-300之间的整数作为海豹判定阈值哦~
 async def set_gacha_threshold(bot, ev: CQEvent):
     if not priv.check_priv(ev, priv.ADMIN):
         await bot.finish(ev, '只有群管理才能修改海豹判定阈值哦~', at_sender=True)
-    threshold = util.normalize_str(ev.message.extract_plain_text())
+    threshold = ev.message.extract_plain_text()
     if not threshold:
         await bot.finish(ev, GACHA_THRESHOLD_TIP, at_sender=True)
-    gid = str(ev.group_id)
-    _gacha_thershold[gid] = threshold
-    dump_threshold_config()
+        return
+    if threshold.isdigit() and 0 < int(threshold) < 301:
+        gid = str(ev.group_id)
+        _gacha_thershold[gid] = threshold
+        dump_threshold_config()
+    else:
+        await bot.finish(ev, GACHA_THRESHOLD_TIP, at_sender=True)
 
 
 @sv.on_message()
@@ -57,10 +72,13 @@ async def pcrsealkiller(bot, ev: CQEvent):
         if m.type == 'image':
             img = m.data['file']
             pic = await bot.get_image(file=img)
-            if pic['filename'].endswith('gif') or pic['size'] / 1024 < EMOJI_CRITERION:
+            if pic['filename'].endswith('gif') or pic['size'] / 1024 < EMOJI_CRITERION or pic['size'] / 1024 > BIG_CRITERION:
                 return
             try:
-                result = await bot.call_action(action='.ocr_image', image=img)
+                if ev.group_id == 1058019377 or ev.group_id == 602138153:
+                    result = await ocr(pic['url'])
+                else:
+                    result = await bot.call_action(action='.ocr_image', image=img)
             except:
                 return
             resultString = str(result)
@@ -81,27 +99,52 @@ async def pcrsealkiller(bot, ev: CQEvent):
                 return
             gachaAmount = int(re.match('[0-9]+', verdictString.group(0)).group(0))
             gid = str(ev.group_id)
-            gachaThershold = _gacha_thershold[gid]
-            if gachaAmount > gachaThershold:
-                return            
+            gachaThershold = _gacha_thershold[gid]          
             
             #抽卡new判定
             isNewGacha = False
-            for r in result['texts']:
+            for r in result['TextDetections']:
                 if r['text'] == keyword:
-                    horizon = r['coordinates'][0]['y']
+                    horizon = r['ItemPolygon']['Y']
                     break
             for r in result['texts']:
                 if r['text'] == 'NEW' and r['coordinates'][0]['y'] < horizon:
                     isNewGacha = True
                     break
-            if not isNewGacha:
-                await bot.send(ev, f"注意！疑似海豹出没中_(:3」」")
-                return
-            
+          
             #海豹审判
-            await bot.send(ev, f"检测到海豹行为(╯‵□′)╯︵┻━┻\n{R.img('sealkiller.png').cqcode}")
-            await util.silence(ev, 6 * gachaAmount)
-            await asyncio.sleep(gachaAmount)         
-            await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
-            return
+            if not isNewGacha and gachaAmount > gachaThershold:
+                return
+            if isNewGacha and gachaAmount <= gachaThershold:
+                await bot.send(ev, f"检测到海豹行为(╯‵□′)╯︵┻━┻\n{R.img('sealkiller.png').cqcode}")
+                await util.silence(ev, 6 * gachaAmount)
+                await asyncio.sleep(gachaAmount)
+                await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+                return
+            else:
+                await bot.send(ev, "注意！疑似海豹出没中_(:3」」")
+                return
+
+
+async def ocr(url):
+    try: 
+        cred = credential.Credential(SecretId, SecretKey)
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "ocr.tencentcloudapi.com"
+
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        client = ocr_client.OcrClient(cred, Region, clientProfile)
+
+        req = models.GeneralBasicOCRRequest()
+        params = {
+            "ImageUrl": url,
+            "LanguageType": "auto"
+        }
+        req.from_json_string(json.dumps(params))
+
+        resp = client.GeneralBasicOCR(req) 
+        return resp
+
+    except TencentCloudSDKException as err: 
+        sv.logger.warning(err)
