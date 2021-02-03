@@ -73,9 +73,9 @@ async def setu_discern_group(bot, ev: CQEvent):
                 img = m.data['file']
                 pic = await bot.get_image(file=img)
                 if pic['filename'].endswith('gif') or pic['size'] / 1024 < EMOJI_CRITERION:
-                    if random.random() < 0.02:
+                    if random.random() < 0.01:
                         await bot.send(ev, '诶嘿~')
-                    elif random.random() < 0.05:
+                    elif random.random() < 0.02:
                         await bot.send(ev, '哦呐嘎憋锅憋锅~')
                     return
                 img_url = m.data['url']
