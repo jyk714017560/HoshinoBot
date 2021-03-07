@@ -199,8 +199,15 @@ async def duel_help(bot, ev: CQEvent):
   每日可获得1次300金币（还没加）
 ╚                                        ╝
 '''
-
-    await bot.send(ev, msg)
+    data ={
+            "type": "node",
+            "data": {
+                "name": '佩可莉姆',
+                "uin": '2651026038',
+                "content": msg
+            }
+            }
+    await bot.send_group_forward_msg(group_id=ev['group_id'], messages=data)
 
 @sv.on_fullmatch(['贵族等级表'])
 async def duel_rank(bot, ev: CQEvent):
@@ -314,7 +321,15 @@ async def help_dlc(bot, ev: CQEvent):
   
 ╚                                 ╝    
 '''
-    await bot.finish(ev, msg)
+    data ={
+            "type": "node",
+            "data": {
+                "name": '佩可莉姆',
+                "uin": '2651026038',
+                "content": msg
+            }
+            }
+    await bot.send_group_forward_msg(group_id=ev['group_id'], messages=data)
 
 
 #取得该群未开启的dlc所形成的黑名单
@@ -2191,7 +2206,15 @@ async def prestige_help(bot, ev: CQEvent):
 妻子不会因决斗被抢走
 
  '''
-    await bot.send(ev, msg)
+    data ={
+            "type": "node",
+            "data": {
+                "name": '佩可莉姆',
+                "uin": '2651026038',
+                "content": msg
+            }
+            }
+    await bot.send_group_forward_msg(group_id=ev['group_id'], messages=data)
 
 
 @sv.on_fullmatch(['查询声望','查声望'])
@@ -2332,7 +2355,16 @@ async def gift_help(bot, ev: CQEvent):
 ╚                                        ╝
 
  '''
-    await bot.send(ev, msg)
+    data ={
+            "type": "node",
+            "data": {
+                "name": '佩可莉姆',
+                "uin": '2651026038',
+                "content": msg
+            }
+            }
+    await bot.send_group_forward_msg(group_id=ev['group_id'], messages=data)
+
 
 
 @sv.on_prefix(['查好感', '查询好感'])
