@@ -113,3 +113,40 @@ class Gacha(object):
                 pass
         result['first_up_pos'] = first_up_pos
         return result      
+
+    def gacha_tenjou_jp(self):
+        result = {'up': [], 's3': [], 's2': [], 's1': []}
+        first_up_pos = 99999
+        up3 = self.up3_prob
+        up2 = self.up2_prob
+        up1 = self.up1_prob
+        s3 = self.s3_prob
+        s2 = self.s2_prob
+        s1 = 1000 - s3 - s2
+        for i in range(9 * 20):
+            c = self.gacha_one(up3, up2, up1, s3, s2, s1)
+            if c.star == 1:
+                result['s1'].append(c)
+            elif c.star == 2:
+                result['s2'].append(c)
+            elif c.name in self.up:
+                result['up'].append(c)
+                first_up_pos = min(first_up_pos, 10 * ((i + 1) // 9) + ((i + 1) % 9))
+            elif c.star == 3:
+                result['s3'].append(c)
+            else:
+                pass
+            
+        for i in range(20):
+            c = self.gacha_one(up3, up2, 0, s3, s2 + s1, 0)
+            if c.star == 2:
+                result['s2'].append(c)
+            elif c.name in self.up:
+                result['up'].append(c)
+                first_up_pos = min(first_up_pos, 10 * (i + 1))
+            elif c.star == 3:
+                result['s3'].append(c)
+            else:
+                pass
+        result['first_up_pos'] = first_up_pos
+        return result     
