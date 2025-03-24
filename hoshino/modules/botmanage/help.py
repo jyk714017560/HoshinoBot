@@ -4,19 +4,16 @@ from hoshino.typing import CQEvent
 sv = Service('_help_', manage_priv=priv.SUPERUSER, visible=False)
 
 TOP_MANUAL = '''
-新增功能：
-[生成表情+关键字+图片] 生成表情
-[#抽签|人品|运势|抽凯露签] 随机角色/指定凯露预测今日运势
 =====================
-- 七七群Bot使用说明 -
+- 群Bot使用说明 -
 =====================
 发送方括号[]内的关键词即可触发
 ※功能采取模块化管理，群管理可控制开关
 
 [#来发十连] 转蛋模拟
-[会战面板] http://140.143.169.143/yobot/user/ 
-[会战帮助] http://140.143.169.143/yobot/help/ 
-[会战手册] http://140.143.169.143/yobot/manual/ 
+[会战面板] http://www.pecorine.xyz/user/ 
+[会战帮助] http://www.pecorine.xyz/help/ 
+[会战手册] http://www.pecorine.xyz/manual/ 
 [lssv] 查看功能模块的开关状态（群管理限定）
 
 发送以下关键词查看更多：
