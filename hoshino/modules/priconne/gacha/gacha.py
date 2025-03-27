@@ -86,7 +86,7 @@ class Gacha(object):
         s3 = self.s3_prob
         s2 = self.s2_prob
         s1 = 1000 - s3 - s2
-        for i in range(9 * 30):
+        for i in range(9 * 20):
             c = self.gacha_one(up3, up2, up1, s3, s2, s1)
             if c.star == 1:
                 result['s1'].append(c)
@@ -100,7 +100,7 @@ class Gacha(object):
             else:
                 pass
             
-        for i in range(30):
+        for i in range(20):
             c = self.gacha_one(up3, up2, 0, s3, s2 + s1, 0)
             if c.star == 2:
                 result['s2'].append(c)

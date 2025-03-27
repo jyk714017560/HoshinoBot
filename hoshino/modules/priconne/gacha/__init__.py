@@ -317,7 +317,10 @@ async def gacha_300(bot, ev: CQEvent):
 
     gid = str(ev.group_id)
     gacha = Gacha(_group_pool[gid])
-    result = gacha.gacha_tenjou()
+    if _group_pool[gid]=='JP' or _group_pool[gid]=='MIX':
+        result = gacha.gacha_tenjou_jp()
+    else:
+        result = gacha.gacha_tenjou()
     up = len(result['up'])
     s3 = len(result['s3'])
     s2 = len(result['s2'])
@@ -347,30 +350,54 @@ async def gacha_300(bot, ev: CQEvent):
         f"★★★×{up+s3} ★★×{s2} ★×{s1}",
         f"获得记忆碎片×{100*up}与女神秘石×{50*(up+s3) + 10*s2 + s1}！\n第{result['first_up_pos']}抽首次获得up角色" if up else f"获得女神秘石{50*(up+s3) + 10*s2 + s1}个！"
     ]
-
-    if up == 0 and s3 == 0:
-        msg.append("太惨了，咱们还是退款删游吧...")
-    elif up == 0 and s3 > 7:
-        msg.append("up呢？我的up呢？")
-    elif up == 0 and s3 <= 3:
-        msg.append("这位酋长，梦幻包考虑一下？")
-    elif up == 0:
-        msg.append("据说天井的概率只有12.16%")
-    elif up <= 2:
-        if result['first_up_pos'] < 50:
-            msg.append("你的喜悦我收到了，滚去喂鲨鱼吧！")
-        elif result['first_up_pos'] < 100:
-            msg.append("已经可以了，您已经很欧了")
-        elif result['first_up_pos'] > 290:
-            msg.append("标 准 结 局")
-        elif result['first_up_pos'] > 250:
-            msg.append("补井还是不补井，这是一个问题...")
-        else:
-            msg.append("期望之内，亚洲水平")
-    elif up == 3:
-        msg.append("抽井母五一气呵成！多出30等专武～")
-    elif up >= 4:
-        msg.append("记忆碎片一大堆！您是托吧？")
+    if _group_pool[gid]=='JP' or _group_pool[gid]=='MIX':
+        if up == 0 and s3 == 0:
+            msg.append("太惨了，咱们还是退款删游吧...")
+        elif up == 0 and s3 > 4:
+            msg.append("up呢？我的up呢？")
+        elif up == 0 and s3 <= 2:
+            msg.append("这位酋长，梦幻包考虑一下？")
+        elif up == 0:
+            msg.append("据说天井的概率有24.54%")
+        elif up <= 2:
+            if result['first_up_pos'] < 33:
+                msg.append("你的喜悦我收到了，滚去喂鲨鱼吧！")
+            elif result['first_up_pos'] < 67:
+                msg.append("已经可以了，您已经很欧了")
+            elif result['first_up_pos'] > 190:
+                msg.append("标 准 结 局")
+            elif result['first_up_pos'] > 166:
+                msg.append("补井还是不补井，这是一个问题...")
+            else:
+                msg.append("期望之内，亚洲水平")
+        elif up == 3:
+            msg.append("抽井母五一气呵成！多出30等专武～")
+        elif up >= 4:
+            msg.append("记忆碎片一大堆！您是托吧？")
+    else:
+        if up == 0 and s3 == 0:
+            msg.append("太惨了，咱们还是退款删游吧...")
+        elif up == 0 and s3 > 7:
+            msg.append("up呢？我的up呢？")
+        elif up == 0 and s3 <= 32:
+            msg.append("这位酋长，梦幻包考虑一下？")
+        elif up == 0:
+            msg.append("据说天井的概率只有24.54%")
+        elif up <= 2:
+            if result['first_up_pos'] < 33:
+                msg.append("你的喜悦我收到了，滚去喂鲨鱼吧！")
+            elif result['first_up_pos'] < 67:
+                msg.append("已经可以了，您已经很欧了")
+            elif result['first_up_pos'] > 190:
+                msg.append("标 准 结 局")
+            elif result['first_up_pos'] > 166:
+                msg.append("补井还是不补井，这是一个问题...")
+            else:
+                msg.append("期望之内，亚洲水平")
+        elif up == 3:
+            msg.append("抽井母五一气呵成！多出30等专武～")
+        elif up >= 4:
+            msg.append("记忆碎片一大堆！您是托吧？")
 
     await bot.send(ev, '\n'.join(msg), at_sender=True)
 
