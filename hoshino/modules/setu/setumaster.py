@@ -53,6 +53,7 @@ def get_setu():
     for setu in results['data']:
         title = setu['title']
         pic_url = setu['url']
+        pic_url=pic_url.replace("cat","re")
         try:
             r = session.get(url=pic_url, timeout=20)
         except (requests.exceptions.RequestException) as e:
@@ -79,7 +80,7 @@ def get_setu():
 
 def setu_producer():
     while True:
-        if len(_setu_list) < 10:
+        if len(_setu_list) > 10:
             setu_list = get_setu()
             for setu in setu_list:
                 _setu_list.append(setu)
@@ -90,7 +91,14 @@ def setu_producer():
     
 async def setu_consumer():
     if not _setu_list:
-        return '色图库正在补充，请稍候再冲'
+        setudir=random.choice(os.listdir('/home/res/img/setu'))
+        setuold=random.choice(os.listdir(os.path.join('/home/res/img/setu',setudir)))
+        titleold=setuold.replace(".jpg","")
+        msg = [
+        f"标题: {titleold}",
+        f"{R.img(f'setu/{setudir}/', f'{setuold}').cqcode}",
+        ]  
+        return '\n'.join(msg)
     setu = _setu_list.pop(0)
     dump_setu_config()
     logger.info('1 setu is take out from the setu list')

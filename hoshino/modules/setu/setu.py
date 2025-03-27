@@ -66,6 +66,7 @@ EMOJI_CRITERION = 70
 @sv.on_message()
 async def setu_discern_group(bot, ev: CQEvent):
     #仅开放七曜群和塞姆利亚群
+    return
     if ev.group_id == 1058019377 or ev.group_id == 602138153:
         if len(ev.message) == 1:
             m = ev.message[0]
