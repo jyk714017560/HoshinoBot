@@ -19,7 +19,7 @@ import json
 sv_help = '''
 贵族决斗帮助：请查看帮助
 '''.strip()
-sv = Service('pcr_duel', help_=sv_help, bundle='pcr娱乐', enable_on_default=True, visible=True)
+sv = Service('pcr_duel', help_=sv_help, bundle='pcr娱乐', enable_on_default=False, visible=True)
 
 DB_PATH = os.path.expanduser("~/.hoshino/pcr_duel.db")
 SCORE_DB_PATH = os.path.expanduser('~/.hoshino/pcr_running_counter.db')
@@ -2838,8 +2838,8 @@ async def cardtrade(bot, ev: CQEvent):
     owner = duel._get_card_owner(gid, cid)
     c = chara.fromid(cid)
     #判断是否是妻子。
-    if duel._get_queen_owner(gid,cid) !=0 :
-        owner = duel._get_queen_owner(gid,cid)
+    if duel._get_wife_owner(gid,cid) !=0 :
+        owner = duel._get_wife_owner(gid,cid)
         card_trade.turn_tradeoff(ev.group_id)
         await bot.finish(ev, f'\n{c.name}现在是\n[CQ:at,qq={owner}]的妻子，无法交易哦。', at_sender=True)
 
