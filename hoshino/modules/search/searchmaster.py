@@ -10,11 +10,12 @@ headers = {
 }
 session.headers = headers
 
-api_key = "755900855ee1ef2a628723"
+api_key = "4d0d0155cb6affe986cada4d79851189e039fe85"
 
 
 def getShareText(baseURL, titletype: str):
     soup = BeautifulSoup(baseURL.text, 'lxml')
+    msg = [f'由未知错误导致{titletype}搜索失败']
     for img in soup.select('.item-box'):
         link = img.select('.detail-box a')
         if not link:
@@ -24,7 +25,7 @@ def getShareText(baseURL, titletype: str):
             continue
         author = link[1]
         if not title['href']:
-            return f'由未知错误导致{titletype}搜索失败'
+            return msg
 
         Author = f"Author: {author['href']}" if author['href'] else ''
         msg = [f"ascii2d {titletype}",
@@ -151,6 +152,18 @@ class SearchMaster(object):
                     title = results['results'][0]['data']['source']    
                     member_name = results['results'][0]['data']['creator'][0]
                     thumbnail = results['results'][0]['header']['thumbnail']
+                elif index_id == 41:
+                    #41->Twitter
+                    service_name = 'Twitter'
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]   
+                elif index_id == 44:
+                    #41->Skeb
+                    service_name = 'Skeb'
+                    thumbnail = results['results'][0]['header']['thumbnail']
+                    member_name = results['results'][0]['data']['author_name']
+                    title = results['results'][0]['data']['creator_name']
+                    ext_url = results['results'][0]['data']['ext_urls'][0]    
                 else:
                     #unknown
                     return '很抱歉，该功能还在摸鱼制作中_(:3」」', False
@@ -180,7 +193,7 @@ class SearchMaster(object):
                     f"[CQ:image,file={thumbnail}]",
                     f"{ext_url}",
                     ]                   
-                elif index_id == 37:
+                elif index_id == 37 or index_id == 44:
                     msg = [f"SauceNAO [{results['results'][0]['header']['similarity']}%] {service_name}",
                     f"「{title}」/「{member_name}」",
                     f"[CQ:image,file={thumbnail}]",
@@ -206,7 +219,8 @@ class SearchMaster(object):
 
 
     def ascii2d(self):
-        imgURL = parse.quote_plus(self.url)
+        #imgURL = parse.quote_plus(self.url)
+        imgURL = self.url
         url = f'https://ascii2d.net/search/url/{imgURL}'
         r = session.get(url=url)
 

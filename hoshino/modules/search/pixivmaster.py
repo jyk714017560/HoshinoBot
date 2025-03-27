@@ -15,6 +15,10 @@ except:
 from hoshino import R, logger
 
 session = requests.session()
+headers = {
+    'token': 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBa2VpIiwidXVpZCI6ImM5MzM0Y2Q3Yzg0NTRkMWI4MWRlMmJmZTZkYzI0ZGFhIiwiaWF0IjoxNjExNTg3MzIzLCJhY2NvdW50Ijoie1wiYXZhdGFyXCI6XCJodHRwczovL2ltYWdlLmFjZ214LmNvbS9hY2NvdW50LzYyMEFrZWkucG5nXCIsXCJlbWFpbFwiOlwiNzE0MDE3NTYwQHFxLmNvbVwiLFwiZ2VuZGVyXCI6LTEsXCJoYXNQcm9uXCI6MCxcImlkXCI6NjIwLFwicGFzc1dvcmRcIjpcIjU3ZGVhZWYyYjg1YzI2ZDg3ZmExMWQwYmQxYzFiMzk1XCIsXCJzdGF0dXNcIjowLFwidXNlck5hbWVcIjpcIkFrZWlcIn0iLCJqdGkiOiI2MjAifQ.tk4-StNIyXzwEi64Nta3-ykEyxqxjmbx8I7kFkd0nJg'
+}
+session.headers = headers
 
 def pixivic_keyword(keyword):
     url = 'https://api.pixivic.com/illustrations'
