@@ -21,7 +21,7 @@ class Mikan:
     async def get_rss():
         res = []
         try:
-            resp = await aiorequests.get('https://mikanani.me/RSS/MyBangumi', params={'token': Mikan.get_token()}, timeout=10)
+            resp = await aiorequests.get('https://mikanime.tv/RSS/MyBangumi', params={'token': Mikan.get_token()}, timeout=10)
             rss = etree.XML(await resp.content)
         except Exception as e:
             sv.logger.error(f'[get_rss] Error: {e}')
@@ -30,7 +30,7 @@ class Mikan:
         for i in rss.xpath('/rss/channel/item'):
             link = i.find('./link').text
             description = i.find('./description').text
-            pubDate = i.find('.//xmlns:pubDate', namespaces={'xmlns': 'https://mikanani.me/0.1/'}).text
+            pubDate = i.find('.//xmlns:pubDate', namespaces={'xmlns': 'https://mikanime.tv/0.1/'}).text
             pubDate = pubDate[:19]
             pubDate = datetime.strptime(pubDate, r'%Y-%m-%dT%H:%M:%S')
             res.append( (link, description, pubDate) )

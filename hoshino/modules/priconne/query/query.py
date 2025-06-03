@@ -4,14 +4,14 @@ from hoshino.typing import CQEvent
 from . import sv
 
 p0 = R.img('priconne/quick/r17-5-tw-0.png').cqcode
-p1 = R.img('priconne/quick/r17-5-tw-1.png').cqcode
-p2 = R.img('priconne/quick/r17-5-tw-2.png').cqcode
-p3 = R.img('priconne/quick/r17-5-tw-3.png').cqcode
-p4 = R.img('priconne/quick/r19-3-1.png').cqcode
-p5 = R.img('priconne/quick/r19-3-2.png').cqcode
-p6 = R.img('priconne/quick/r19-3-3.png').cqcode
-p7 = R.img('priconne/quick/r11-4-cn-1.png').cqcode
-p8 = R.img('priconne/quick/r11-4-cn-2.png').cqcode
+p1 = R.img('priconne/quick/r21-3-tw-1.png').cqcode
+p2 = R.img('priconne/quick/r21-3-tw-2.png').cqcode
+p3 = R.img('priconne/quick/r21-3-tw-3.png').cqcode
+p4 = R.img('priconne/quick/r20-4-1.png').cqcode
+p5 = R.img('priconne/quick/r20-4-2.png').cqcode
+p6 = R.img('priconne/quick/r20-4-3.png').cqcode
+p7 = R.img('priconne/quick/r15-3-cn-1.jpg').cqcode
+p8 = R.img('priconne/quick/r11-5-cn-2.png').cqcode
 
 @sv.on_rex(r'^(\*?([日台国陆b])服?([前中后]*)卫?)?rank(表|推荐|指南)?$')
 async def rank_sheet(bot, ev):
@@ -24,32 +24,23 @@ async def rank_sheet(bot, ev):
         return
     msg = []
     if is_jp:
-        msg.append('R19-3 rank表：')
-        pos = match.group(3)
-        if not pos or '前' in pos:
-            msg.append(str(p4))
-        if not pos or '中' in pos:
-            msg.append(str(p5))
-        if not pos or '后' in pos:
-            msg.append(str(p6))
+        msg.append('R20-4 rank表：')
+        msg.append('大人，时代变了\n已经没有什么rank表了')
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_tw:
-        msg.append('\n※搬运自漪夢奈特\nR17-5 rank表：')
-        pos = match.group(3)
-        if not pos:
-            msg.append('使用 [台前/台中/台后]rank 查看详情')
-            msg.append(str(p0))     
-        if '前' in pos:
+        msg.append('※仅供参考\n台R21-3 rank表：')
+        pos = match.group(3)  
+        if not pos or '前' in pos:
             msg.append(str(p1))
-        if '中' in pos:
+        if not pos or '中' in pos:
             msg.append(str(p2))
-        if '后' in pos:
+        if not pos or '后' in pos:
             msg.append(str(p3))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
     elif is_cn:
-        msg.append('R11-4 rank表：')
+        msg.append('R15-3 rank表：')
         msg.append(str(p7))
-        msg.append(str(p8))
+        # msg.append(str(p8))
         await bot.send(ev, '\n'.join(msg), at_sender=True)
         # await bot.send(ev, str(p7))
 
