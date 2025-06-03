@@ -15,9 +15,6 @@ from . import _pcr_data
 logger = log.new_logger('chara', hoshino.config.DEBUG)
 UNKNOWN = 1000
 UnavailableChara = {
-    1067,   # 穗希
-    1068,   # 晶
-    1069,   # 霸瞳
     1072,   # 可萝爹
     1073,   # 拉基拉基
     1102,   # 泳装大眼
@@ -99,7 +96,7 @@ def is_npc(id_):
     if id_ in UnavailableChara:
         return True
     else:
-        return not ((1000 < id_ < 1200) or (1700 < id_ < 1900))
+        return not ((1000 < id_ < 1400) or (1700 < id_ < 1900))
 
 def gen_team_pic(team, size=64, star_slot_verbose=True):
     num = len(team)
@@ -166,7 +163,10 @@ class Chara:
 
     @property
     def card(self):
-        res = R.img(f'priconne/card/card_{self.id}61.png')
+        star = '6' if 0 <= self.star <= 2 else '3'
+        res = R.img(f'priconne/card/card_{self.id}{star}1.png')
+        if not res.exist:
+            res = R.img(f'priconne/card/card_{self.id}61.png')
         if not res.exist:
             res = R.img(f'priconne/card/card_{self.id}31.png')
         if not res.exist:

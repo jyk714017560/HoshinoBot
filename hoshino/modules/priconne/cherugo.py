@@ -72,7 +72,7 @@ async def cherulize(bot, ev: CQEvent):
     if len(s) > 500:
         await bot.send(ev, '切、切噜太长切不动勒切噜噜...', at_sender=True)
         return
-    await bot.send(ev, '切噜～♪' + str2cheru(s))
+    await bot.send(ev, '切噜～♪' + str2cheru(s), at_sender=True)
 
 
 @sv.on_prefix('切噜～♪')

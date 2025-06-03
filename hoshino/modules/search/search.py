@@ -18,8 +18,8 @@ except:
     import json
 
 sv = Service('search', help_='[搜图+图片] 以图搜图\n[搜图+关键字] 关键字搜图\n[点歌+关键字] 关键字点歌', bundle='pcr娱乐', enable_on_default=True, visible=True)
-search_limit = DailyNumberLimiter(15)
-lmt = FreqLimiter(15)
+search_limit = DailyNumberLimiter(5)
+lmt = FreqLimiter(60)
 
 SEARCH_EXCEED_NOTICE = f'你今天搜的图太多辣，欢迎明早5点后再来！'
 
@@ -160,6 +160,34 @@ async def search_music(bot, ev: CQEvent):
             return
         try:
             t = MusicThread(music_keyword, args=keyword)
+            t.start()
+            t.join()
+            msg = t.get_result()
+            print(msg)
+            await bot.send(ev, msg, at_sender=True)
+        except:
+            await bot.send(ev, '由未知错误导致点歌失败QAQ', at_sender=True)
+
+@sv.on_prefix('qq点歌')
+async def search_music(bot, ev: CQEvent):
+    if not lmt.check(ev.user_id):
+        await bot.send(ev, f'乖，要懂得节制噢，点歌冷却中(剩余 {int(lmt.left_time(ev.user_id)) + 1}秒)', at_sender=True)
+        return
+    lmt.start_cd(ev.user_id)
+
+    if not search_limit.check(ev.user_id):
+        await bot.send(ev, '你今天点的歌太多辣，欢迎明早5点后再来！', at_sender=True)
+        return
+    search_limit.increase(ev.user_id, 1)
+
+    m = ev.message[0]
+    if m.type == 'text':
+        keyword = ev.message[0].data['text']
+        if not keyword:
+            await bot.send(ev, ' 必须要发送指令我才能帮你找噢\n> 点歌+关键字: 关键字点歌\n> 功能优化中……_(:3」」', at_sender=True)
+            return
+        try:
+            t = MusicThread(music_keyword_qq, args=keyword)
             t.start()
             t.join()
             msg = t.get_result()

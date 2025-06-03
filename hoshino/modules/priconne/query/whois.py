@@ -54,3 +54,17 @@ async def fullcard_ex(bot, ev: CQEvent):
 
     msg = f'{c.card.cqcode}'
     await bot.send(ev, msg)
+
+@sv.on_suffix('三星')
+@sv.on_prefix('三星')
+async def whois(bot, ev: CQEvent):
+    name = ev.message.extract_plain_text().strip()
+    if not name:
+        return
+    id_ = chara.name2id(name)
+    if id_ == chara.UNKNOWN:
+        return
+    c = chara.fromid(id_,3)
+
+    msg = f'{c.card.cqcode}'
+    await bot.send(ev, msg)
