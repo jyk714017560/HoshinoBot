@@ -8,7 +8,7 @@ import hoshino
 from hoshino import R, Service
 from hoshino.util import pic2b64,DailyNumberLimiter
 from hoshino.typing import *
-from .luck_desc import luck_desc
+from .luck_desc import luck_desc,luck_desc_genshin,luck_desc_uma,luck_desc_df
 from .luck_type import luck_type
 
 
@@ -51,6 +51,42 @@ async def portune_kyaru(bot, ev):
     pic = drawing_pic(model)
     await bot.send(ev, pic, at_sender=True)
 
+@sv.on_prefix(('抽原神签'), only_to_me=True)
+async def portune_genshin(bot, ev):
+
+    if not lmt.check(ev.user_id):
+        await bot.finish(ev, PORTUNE_EXCEED_NOTICE, at_sender=True)
+    lmt.increase(ev.user_id, 1)
+
+    model = 'GENSHIN'
+
+    pic = drawing_pic(model)
+    await bot.send(ev, pic, at_sender=True)
+
+@sv.on_prefix(('抽马娘签','马娘抽签'), only_to_me=True)
+async def portune_uma(bot, ev):
+
+    if not lmt.check(ev.user_id):
+        await bot.finish(ev, PORTUNE_EXCEED_NOTICE, at_sender=True)
+    lmt.increase(ev.user_id, 1)
+
+    model = 'UMA'
+
+    pic = drawing_pic(model)
+    await bot.send(ev, pic, at_sender=True)
+
+@sv.on_prefix(('抽东方签'), only_to_me=True)
+async def portune_df(bot, ev):
+
+    if not lmt.check(ev.user_id):
+        await bot.finish(ev, PORTUNE_EXCEED_NOTICE, at_sender=True)
+    lmt.increase(ev.user_id, 1)
+
+    model = 'DF'
+
+    pic = drawing_pic(model)
+    await bot.send(ev, pic, at_sender=True)
+
 
 def drawing_pic(model) -> Image:
     fontPath = {
@@ -60,19 +96,32 @@ def drawing_pic(model) -> Image:
 
     if model == 'KYARU':  
         base_img = R.img(os.path.join(Img_Path, "frame_1.jpg"))
+    elif model == 'GENSHIN':
+        base_dir = R.img(Img_Path,"genshin").path
+        random_img = random.choice(os.listdir(base_dir))
+        base_img = R.img(os.path.join(Img_Path,"genshin", random_img))
+    elif model == 'UMA':
+        base_dir = R.img(Img_Path,"uma").path
+        random_img = random.choice(os.listdir(base_dir))
+        base_img = R.img(os.path.join(Img_Path,"uma", random_img))
+    elif model == 'DF':
+        base_dir = R.img(Img_Path,"df").path
+        random_img = random.choice(os.listdir(base_dir))
+        base_img = R.img(os.path.join(Img_Path,"df", random_img))
     else:
-        base_dir = R.img(Img_Path).path
+        base_dir = R.img(Img_Path,"pcr").path
         random_img = random.choice(os.listdir(base_dir))
         base_img = R.img(os.path.join(Img_Path, random_img))
 
     filename = os.path.basename(base_img.path)
     charaid = filename.lstrip('frame_')
     charaid = charaid.rstrip('.jpg')
+    charaid = charaid.rstrip('.png')
 
     img = base_img.open()
     # Draw title
     draw = ImageDraw.Draw(img)
-    text, title = get_info(charaid)
+    text, title = get_info(charaid,model)
 
     font_size = 45
     color = '#F5F5F5'
@@ -102,15 +151,43 @@ def drawing_pic(model) -> Image:
     return img
 
 
-def get_info(charaid):
-    for i in luck_desc:
-        if charaid in i['charaid']:
-            typewords = i['type']
-            desc = random.choice(typewords)
-            target_luck_type = desc['good-luck']
-            for j in luck_type:
-                if j['good-luck'] == target_luck_type:
-                    return desc['content'], j['name']
+def get_info(charaid,model):
+    if model == 'GENSHIN':
+        for i in luck_desc_genshin:
+            if charaid in i['charaid']:
+                typewords = i['type']
+                desc = random.choice(typewords)
+                target_luck_type = desc['good-luck']
+                for j in luck_type:
+                    if j['good-luck'] == target_luck_type:
+                        return desc['content'], j['name']
+    elif model == 'UMA':
+        for i in luck_desc_uma:
+            if charaid in i['charaid']:
+                typewords = i['type']
+                desc = random.choice(typewords)
+                target_luck_type = desc['good-luck']
+                for j in luck_type:
+                    if j['good-luck'] == target_luck_type:
+                        return desc['content'], j['name']
+    elif model == 'df':
+        for i in luck_desc_df:
+            if charaid in i['charaid']:
+                typewords = i['type']
+                desc = random.choice(typewords)
+                target_luck_type = desc['good-luck']
+                for j in luck_type:
+                    if j['good-luck'] == target_luck_type:
+                        return desc['content'], j['name']
+    else:
+        for i in luck_desc:
+            if charaid in i['charaid']:
+                typewords = i['type']
+                desc = random.choice(typewords)
+                target_luck_type = desc['good-luck']
+                for j in luck_type:
+                    if j['good-luck'] == target_luck_type:
+                        return desc['content'], j['name']
     raise Exception('luck description not found')
 
 
